@@ -1,0 +1,5 @@
+{
+    "parser": "do not use prettier in this project",
+    "singleQuote": true,
+    "trailingComma": "all"
+}
