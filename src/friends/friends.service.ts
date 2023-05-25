@@ -16,6 +16,8 @@ export class FriendsService implements IFriendsService {
     async addFriend({user,userId}:AddFriendParams): Promise<Friend> {
         const userTwo = await this.userService.findUser({id: userId})
         if(!userTwo) throw new HttpException("Invalid user",HttpStatus.BAD_REQUEST);
+        const friends = await this.isFriends(user.id,userTwo.id);
+        if(friends) throw new HttpException("Already friends",HttpStatus.CONFLICT);
         const newFriend = await this.friendRepository.create({userOne:user,userTwo})
         return this.friendRepository.save(newFriend);
     }
@@ -35,6 +37,17 @@ export class FriendsService implements IFriendsService {
         return this.friendRepository.findOne({ where: { id },relations: ['userOne', 'userTwo']});
     }
     isFriends(userOneId: number, userTwoId: number): Promise<Friend> {
-        throw new Error('Method not implemented.');
+        return this.friendRepository.findOne({
+            where: [
+              {
+                userOne: { id: userOneId },
+                userTwo: { id: userTwoId },
+              },
+              {
+                userOne: { id: userTwoId },
+                userTwo: { id: userOneId },
+              },
+            ],
+          });
     }
 }

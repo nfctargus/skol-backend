@@ -19,4 +19,14 @@ export class UserService implements IUserService {
     async findUser(findUserParams: FindUserParams): Promise<User> {
         return this.userRepository.findOneBy(findUserParams);
     }
+    searchUsers(userId:number,query: string) {
+        const statement = '(user.email LIKE :query)';
+        return this.userRepository
+            .createQueryBuilder('user')
+            .where(statement, { query: `%${query}%` })
+            .andWhere('id != :id', {id:userId})
+            .limit(10)
+            .select(['user.id','user.firstName', 'user.lastName', 'user.email', 'user.username'])
+            .getMany();
+    }
 }

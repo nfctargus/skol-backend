@@ -4,4 +4,5 @@ import { CreateUserParams, FindUserParams } from "utils/types";
 export interface IUserService {
     createUser(userDetails:CreateUserParams):Promise<User>;
     findUser(findUserParams:FindUserParams):Promise<User>;
+    searchUsers(userId:number,query:string):Promise<User[]>;
 }
