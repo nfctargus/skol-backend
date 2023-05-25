@@ -5,6 +5,9 @@ import { UserModule } from './users/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'utils/typeorm';
 import { PassportModule } from '@nestjs/passport';
+import { FriendsController } from './friends/friends.controller';
+import { FriendsService } from './friends/friends.service';
+import { FriendsModule } from './friends/friends.module';
 
 
 @Module({
@@ -12,6 +15,7 @@ import { PassportModule } from '@nestjs/passport';
         ConfigModule.forRoot({ envFilePath: '.env.development'}),
         AuthModule,
         UserModule, 
+        FriendsModule,
         PassportModule.register({ session: true }),
         TypeOrmModule.forRoot({
             type:'mysql',

@@ -12,10 +12,14 @@ export type ValidateUserCredentials = {
     password:string;
 }
 export type FindUserParams = Partial<{
-    id: string;
+    id: number;
     email:string;
     username:string;
 }>
 export interface AuthenticatedRequest extends Request {
     user: User;
 } 
+export type AddFriendParams = {
+    user: User;
+    userId: number;
+};
