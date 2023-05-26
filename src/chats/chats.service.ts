@@ -29,6 +29,7 @@ export class ChatsService implements IChatsService {
         .createQueryBuilder('chat')
         .leftJoinAndSelect('chat.creator','creator')
         .leftJoinAndSelect('chat.recipient','recipient')
+        .leftJoinAndSelect('chat.messages','messages')
         .where('creator.id = :id', { id })
         .orWhere('recipient.id = :id', { id })
         .leftJoinAndSelect('chat.lastMessageSent','lastMessageSent')
