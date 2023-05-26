@@ -19,7 +19,7 @@ export class ChatsService implements IChatsService {
         const exists = await this.findChatByUserId(creator.id,recipient.id);
         if(exists) throw new HttpException('This chat already exists', HttpStatus.CONFLICT);
         const chat = this.chatRepository.create({creator,recipient});
-        const savedChat = await this.chatRepository.save(chat);
+        const savedChat = await this.save(chat);
         const privateMessage = this.messageRepository.create({messageContent,chat,author:creator})
         await this.messageRepository.save(privateMessage);
         return savedChat;
@@ -55,4 +55,7 @@ export class ChatsService implements IChatsService {
     save(chat: Chat): Promise<Chat> {
         return this.chatRepository.save(chat);
     } 
+    async getChatOnly(id:number):Promise<Chat> {
+        return this.chatRepository.findOne({where: [{id}],relations: ['creator','recipient']});
+    }
 }

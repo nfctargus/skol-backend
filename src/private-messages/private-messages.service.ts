@@ -12,7 +12,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
     constructor(@InjectRepository(PrivateMessage) private readonly messageRepository:Repository<PrivateMessage>,
                 @Inject(Services.CHAT) private readonly chatService:IChatsService) {}
     async createPrivateMessage({messageContent,chatId,user:author}: CreatePrivateMessageParams):Promise<CreateMessageResponse> {
-        const chat = await this.chatService.getChatById(chatId);
+        const chat = await this.chatService.getChatOnly(chatId);
         if(!chat) throw new HttpException('Chat not found',HttpStatus.BAD_REQUEST);
         const {creator,recipient} = chat;
         if(creator.id !== author.id && recipient.id !== author.id) throw new HttpException('You are not a part of this chat!',HttpStatus.UNAUTHORIZED);
@@ -22,5 +22,11 @@ export class PrivateMessagesService implements IPrivateMessagesService {
         const updatedChat = await this.chatService.save(chat);
         return { message:privateMessage,chat:updatedChat };
     }
-    
+    getPrivateMessages(id: number): Promise<PrivateMessage[]> {
+        return this.messageRepository.find({
+            relations: ['author'],
+            where: { chat: { id } },
+            order: { createdAt: 'DESC' },
+        });
+    }    
 }

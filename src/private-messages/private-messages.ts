@@ -1,5 +1,7 @@
+import { PrivateMessage } from "utils/typeorm";
 import { CreateMessageResponse, CreatePrivateMessageParams } from "utils/types";
 
 export interface IPrivateMessagesService {
-    createPrivateMessage(params:CreatePrivateMessageParams):Promise<CreateMessageResponse>
+    createPrivateMessage(params:CreatePrivateMessageParams):Promise<CreateMessageResponse>;
+    getPrivateMessages(id: number): Promise<PrivateMessage[]>;
 }
