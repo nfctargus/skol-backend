@@ -1,4 +1,5 @@
-import { User } from "./typeorm";
+import { Chat, User } from "./typeorm";
+import { Message } from "./typeorm/entities/Message";
 
 export type CreateUserParams = {
     email:string;
@@ -26,4 +27,18 @@ export type AddFriendParams = {
 export type DeleteFriendParams = {
     id:number;
     friendId:number;
+}
+export type CreateChatParams = {
+    user:User;
+    email:string;
+    message:string;
+}
+export type CreatePrivateMessageParams = {
+    messageContent:string;
+    chatId:number;
+    user:User;
+}
+export type CreateMessageResponse = {
+    message:Message;
+    chat:Chat;
 }

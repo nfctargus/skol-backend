@@ -8,6 +8,10 @@ import { PassportModule } from '@nestjs/passport';
 import { FriendsController } from './friends/friends.controller';
 import { FriendsService } from './friends/friends.service';
 import { FriendsModule } from './friends/friends.module';
+import { ChatsModule } from './chats/chats.module';
+import { PrivateMessagesService } from './private-messages/private-messages.service';
+import { PrivateMessagesController } from './private-messages/private-messages.controller';
+import { PrivateMessagesModule } from './private-messages/private-messages.module';
 
 
 @Module({
@@ -27,6 +31,8 @@ import { FriendsModule } from './friends/friends.module';
             entities,
             synchronize:true,
         }),
+        ChatsModule,
+        PrivateMessagesModule,
     ],
     controllers: [],
     providers: [],
