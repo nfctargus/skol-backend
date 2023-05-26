@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { Routes, Services } from 'utils/contants';
 import { AuthUser } from 'utils/decorators';
 import { User } from 'utils/typeorm';
@@ -18,5 +18,9 @@ export class FriendsController {
     @Get(':id')
     getFriendById(@Param('id',ParseIntPipe) id:number) {
         return this.friendService.findFriendById(id);
+    }
+    @Delete(':id')
+    deleteFriendById(@AuthUser() {id}:User,@Param('id',ParseIntPipe) friendId:number) {
+        return this.friendService.deleteFriend({id,friendId});
     }
 }

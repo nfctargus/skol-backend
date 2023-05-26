@@ -3,7 +3,7 @@ import { IFriendsService } from './friends';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddFriendParams } from 'utils/types';
+import { AddFriendParams, DeleteFriendParams } from 'utils/types';
 import { Services } from 'utils/contants';
 import { IUserService } from 'src/users/user';
 import { Friend } from 'utils/typeorm/entities/Friend';
@@ -21,8 +21,11 @@ export class FriendsService implements IFriendsService {
         const newFriend = await this.friendRepository.create({userOne:user,userTwo})
         return this.friendRepository.save(newFriend);
     }
-    deleteFriend(userId: number) {
-        throw new Error('Method not implemented.');
+    async deleteFriend({id,friendId}:DeleteFriendParams) {
+        const friends = await this.isFriends(id,friendId)
+        if(!friends) throw new HttpException("You are not friends with this user.",HttpStatus.BAD_REQUEST);
+        await this.friendRepository.delete({id:friends.id});
+        return {id: friendId}
     }
     getFriends(user:User): Promise<Friend[]> {
         return this.friendRepository.find({

@@ -23,3 +23,7 @@ export type AddFriendParams = {
     user: User;
     userId: number;
 };
+export type DeleteFriendParams = {
+    id:number;
+    friendId:number;
+}
