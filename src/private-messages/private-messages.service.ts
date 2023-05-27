@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IPrivateMessagesService } from './private-messages';
-import { CreateMessageResponse, CreatePrivateMessageParams } from 'utils/types';
+import { CreateMessageResponse, CreatePrivateMessageParams, EditPrivateMessageParams } from 'utils/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PrivateMessage } from 'utils/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +11,7 @@ import { IChatsService } from 'src/chats/chats';
 export class PrivateMessagesService implements IPrivateMessagesService {
     constructor(@InjectRepository(PrivateMessage) private readonly messageRepository:Repository<PrivateMessage>,
                 @Inject(Services.CHAT) private readonly chatService:IChatsService) {}
+
     async createPrivateMessage({messageContent,chatId,user:author}: CreatePrivateMessageParams):Promise<CreateMessageResponse> {
         const chat = await this.chatService.getChatOnly(chatId);
         if(!chat) throw new HttpException('Chat not found',HttpStatus.BAD_REQUEST);
@@ -21,12 +22,25 @@ export class PrivateMessagesService implements IPrivateMessagesService {
         chat.lastMessageSent = savedMessage;
         const updatedChat = await this.chatService.update(chat);
         return { message:privateMessage,chat:updatedChat };
-    }
+    };
     getPrivateMessages(id: number): Promise<PrivateMessage[]> {
         return this.messageRepository.find({
             relations: ['author'],
             where: { chat: { id } },
             order: { createdAt: 'DESC' },
         });
-    }    
+    }; 
+    getPrivateMessageById(id: number): Promise<PrivateMessage> {
+        return this.messageRepository.findOne({
+            relations: ['author'],
+            where: { id },
+        });
+    }
+    async editPrivateMessage({user,id,messageContent}:EditPrivateMessageParams):Promise<PrivateMessage> {
+        const message = await this.getPrivateMessageById(id);
+        if(!message) throw new HttpException('Message not found!',HttpStatus.BAD_REQUEST);
+        if(message.author.id !== user.id) throw new HttpException('You cannot edit another users message!',HttpStatus.BAD_REQUEST);
+        message.messageContent = messageContent;
+        return this.messageRepository.save(message)
+    }
 }

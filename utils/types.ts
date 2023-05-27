@@ -46,3 +46,8 @@ export type UpdateChatParams = {
     id:number;
     lastMessageSent:PrivateMessage;
 }
+export type EditPrivateMessageParams = {
+    user:User;
+    id:number;
+    messageContent:string;
+}
