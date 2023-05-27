@@ -1,5 +1,3 @@
-
-
 declare namespace NodeJS {
     export interface ProcessEnv {
         MYSQL_DB_HOST?:string;
@@ -14,5 +12,6 @@ declare namespace Express {
     import { User } from "utils/typeorm";
     export interface Request {
       user?: User;
+      logout:Function;
     }
   }

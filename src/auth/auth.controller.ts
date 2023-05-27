@@ -27,4 +27,11 @@ export class AuthController {
     authStatus(@Req() req:Request,@Res() res:Response) {
         res.send(req.user);
     }
+    @Post('logout')
+    @UseGuards(AuthenticatedGuard)
+    logout(@Req() req: Request, @Res() res: Response) {
+        req.logout((err) => {
+        return err ? res.send(400) : res.send(200);
+        });
+    }
 }
