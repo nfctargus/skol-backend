@@ -19,7 +19,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
         const privateMessage = this.messageRepository.create({messageContent,chat,author})
         const savedMessage = await this.messageRepository.save(privateMessage);
         chat.lastMessageSent = savedMessage;
-        const updatedChat = await this.chatService.save(chat);
+        const updatedChat = await this.chatService.update(chat);
         return { message:privateMessage,chat:updatedChat };
     }
     getPrivateMessages(id: number): Promise<PrivateMessage[]> {

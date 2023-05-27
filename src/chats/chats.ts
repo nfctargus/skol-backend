@@ -1,5 +1,5 @@
 import { Chat } from "utils/typeorm";
-import { CreateChatParams } from "utils/types";
+import { CreateChatParams, UpdateChatParams } from "utils/types";
 
 export interface IChatsService {
     createChat(params:CreateChatParams):Promise<Chat>;
@@ -7,4 +7,5 @@ export interface IChatsService {
     getChatById(id:number):Promise<Chat>;
     save(chat: Chat): Promise<Chat>;
     getChatOnly(id: number): Promise<Chat>;
+    update(params: UpdateChatParams);
 }

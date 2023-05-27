@@ -5,7 +5,7 @@ import { Chat, PrivateMessage } from 'utils/typeorm';
 import { Repository } from 'typeorm';
 import { Services } from 'utils/contants';
 import { IUserService } from 'src/users/user';
-import { CreateChatParams } from 'utils/types';
+import { CreateChatParams, UpdateChatParams } from 'utils/types';
 
 @Injectable()
 export class ChatsService implements IChatsService {
@@ -21,7 +21,8 @@ export class ChatsService implements IChatsService {
         const chat = this.chatRepository.create({creator,recipient});
         const savedChat = await this.save(chat);
         const privateMessage = this.messageRepository.create({messageContent,chat,author:creator})
-        await this.messageRepository.save(privateMessage);
+        const savedMessage = await this.messageRepository.save(privateMessage);
+        await this.update({id:savedChat.id,lastMessageSent:savedMessage});
         return savedChat;
     };
     async getChats(id:number):Promise<Chat[]> {
@@ -58,5 +59,8 @@ export class ChatsService implements IChatsService {
     } 
     async getChatOnly(id:number):Promise<Chat> {
         return this.chatRepository.findOne({where: [{id}],relations: ['creator','recipient']});
+    }
+    update({ id, lastMessageSent }:UpdateChatParams) {
+        return this.chatRepository.update(id, { lastMessageSent });
     }
 }
