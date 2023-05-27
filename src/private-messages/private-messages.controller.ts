@@ -12,6 +12,7 @@ export class PrivateMessagesController {
 
     @Post()
     createPrivateMessage(@AuthUser() user: User,@Param('id', ParseIntPipe) id: number,@Body() {messageContent}:CreatePrivateMessageDto) {
+        console.log(messageContent)
         return this.messageService.createPrivateMessage({messageContent,chatId:id,user})
     }
     @Get()

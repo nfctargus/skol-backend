@@ -1,4 +1,4 @@
-import { Chat, User } from "./typeorm";
+import { Chat, PrivateMessage, User } from "./typeorm";
 import { Message } from "./typeorm/entities/Message";
 
 export type CreateUserParams = {
@@ -39,6 +39,6 @@ export type CreatePrivateMessageParams = {
     user:User;
 }
 export type CreateMessageResponse = {
-    message:Message;
+    message:PrivateMessage;
     chat:Chat;
 }
