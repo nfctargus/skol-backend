@@ -1,9 +1,9 @@
 import { PrivateMessage } from "utils/typeorm";
-import { CreateMessageResponse, CreatePrivateMessageParams, EditMessageResponse, EditPrivateMessageParams } from "utils/types";
+import { CreatePrivateMessageResponse, CreatePrivateMessageParams, EditPrivateMessageResponse, EditPrivateMessageParams } from "utils/types";
 
 export interface IPrivateMessagesService {
-    createPrivateMessage(params:CreatePrivateMessageParams):Promise<CreateMessageResponse>;
+    createPrivateMessage(params:CreatePrivateMessageParams):Promise<CreatePrivateMessageResponse>;
     getPrivateMessages(id: number): Promise<PrivateMessage[]>;
     getPrivateMessageById(id:number):Promise<PrivateMessage>;
-    editPrivateMessage(params:EditPrivateMessageParams):Promise<EditMessageResponse>
+    editPrivateMessage(params:EditPrivateMessageParams):Promise<EditPrivateMessageResponse>
 }

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IPrivateMessagesService } from './private-messages';
-import { CreateMessageResponse, CreatePrivateMessageParams, EditMessageResponse, EditPrivateMessageParams } from 'utils/types';
+import { CreatePrivateMessageResponse, CreatePrivateMessageParams, EditPrivateMessageResponse, EditPrivateMessageParams } from 'utils/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PrivateMessage } from 'utils/typeorm';
 import { Repository } from 'typeorm';
@@ -12,7 +12,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
     constructor(@InjectRepository(PrivateMessage) private readonly messageRepository:Repository<PrivateMessage>,
                 @Inject(Services.CHAT) private readonly chatService:IChatsService) {}
 
-    async createPrivateMessage({messageContent,chatId,user:author}: CreatePrivateMessageParams):Promise<CreateMessageResponse> {
+    async createPrivateMessage({messageContent,chatId,user:author}: CreatePrivateMessageParams):Promise<CreatePrivateMessageResponse> {
         const chat = await this.chatService.getChatOnly(chatId);
         if(!chat) throw new HttpException('Chat not found',HttpStatus.BAD_REQUEST);
         const {creator,recipient} = chat;
@@ -36,7 +36,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
             where: { id },
         });
     }
-    async editPrivateMessage({user,id,messageContent}:EditPrivateMessageParams):Promise<EditMessageResponse> {
+    async editPrivateMessage({user,id,messageContent}:EditPrivateMessageParams):Promise<EditPrivateMessageResponse> {
         const message = await this.getPrivateMessageById(id);
         if(!message) throw new HttpException('Message not found!',HttpStatus.BAD_REQUEST);
         if(message.author.id !== user.id) throw new HttpException('You cannot edit another users message!',HttpStatus.BAD_REQUEST);

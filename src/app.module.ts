@@ -5,14 +5,11 @@ import { UserModule } from './users/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'utils/typeorm';
 import { PassportModule } from '@nestjs/passport';
-import { FriendsController } from './friends/friends.controller';
-import { FriendsService } from './friends/friends.service';
 import { FriendsModule } from './friends/friends.module';
 import { ChatsModule } from './chats/chats.module';
-import { PrivateMessagesService } from './private-messages/private-messages.service';
-import { PrivateMessagesController } from './private-messages/private-messages.controller';
 import { PrivateMessagesModule } from './private-messages/private-messages.module';
-
+import { GroupChatsModule } from './group-chats/group-chats.module';
+import { GroupMessagesModule } from './group-messages/group-messages.module';
 
 @Module({
     imports: [
@@ -33,6 +30,8 @@ import { PrivateMessagesModule } from './private-messages/private-messages.modul
         }),
         ChatsModule,
         PrivateMessagesModule,
+        GroupChatsModule,
+        GroupMessagesModule,
     ],
     controllers: [],
     providers: [],

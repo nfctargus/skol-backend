@@ -1,4 +1,4 @@
-import { Chat, PrivateMessage, User } from "./typeorm";
+import { Chat, GroupChat, GroupMessage, PrivateMessage, User } from "./typeorm";
 import { Message } from "./typeorm/entities/Message";
 
 export type CreateUserParams = {
@@ -38,20 +38,48 @@ export type CreatePrivateMessageParams = {
     chatId:number;
     user:User;
 }
-export type CreateMessageResponse = {
+export type CreateGroupMessageParams = {
+    messageContent:string;
+    groupChatId:number;
+    user:User;
+}
+export type CreatePrivateMessageResponse = {
     message:PrivateMessage;
     chat:Chat;
 }
-export type EditMessageResponse = {
+export type CreateGroupMessageResponse = {
+    message:GroupMessage;
+    chat:GroupChat;
+}
+export type EditPrivateMessageResponse = {
     messageId:number;
     message:PrivateMessage;
+}
+export type EditGroupMessageResponse = {
+    messageId:number;
+    message:GroupMessage;
 }
 export type UpdateChatParams = {
     id:number;
     lastMessageSent:PrivateMessage;
 }
+export type UpdateGroupChatParams = {
+    id:number;
+    lastMessageSent:GroupMessage;
+}
 export type EditPrivateMessageParams = {
     user:User;
     id:number;
     messageContent:string;
+}
+export type EditGroupMessageParams = {
+    user:User;
+    id:number;
+    messageContent:string;
+}
+export type CreateGroupChatParams = {
+    name?:string;
+    creator:User;
+    members:string[];
+    message:string;
 }
