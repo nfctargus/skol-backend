@@ -42,6 +42,10 @@ export type CreateMessageResponse = {
     message:PrivateMessage;
     chat:Chat;
 }
+export type EditMessageResponse = {
+    messageId:number;
+    message:PrivateMessage;
+}
 export type UpdateChatParams = {
     id:number;
     lastMessageSent:PrivateMessage;

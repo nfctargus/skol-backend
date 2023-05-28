@@ -25,7 +25,7 @@ export class PrivateMessagesController {
         return this.messageService.getPrivateMessageById(id);
     }
     @Patch()
-    editPrivateMessage(@AuthUser() user:User,@Body() {id,messageContent}:EditPrivateMessageDto) {
-        return this.messageService.editPrivateMessage({user,id,messageContent})
+    editPrivateMessage(@AuthUser() user:User,@Body() {messageId,messageContent}:EditPrivateMessageDto) {
+        return this.messageService.editPrivateMessage({user,id:messageId,messageContent})
     }
 }
