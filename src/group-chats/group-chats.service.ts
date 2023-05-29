@@ -33,6 +33,7 @@ export class GroupChatsService implements IGroupChatsService {
         .where('member.id IN (:members)', { members: id })
         .leftJoinAndSelect('groupChat.members','members')
         .leftJoinAndSelect('groupChat.lastMessageSent','lastMessageSent')
+        .leftJoinAndSelect('groupChat.creator','creator')
         .orderBy('groupChat.lastMessageSentAt','DESC')
         .getMany()
     }
