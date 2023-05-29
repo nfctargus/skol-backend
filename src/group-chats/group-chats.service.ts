@@ -31,6 +31,7 @@ export class GroupChatsService implements IGroupChatsService {
         .leftJoinAndSelect('groupChat.members','member')
         .leftJoinAndSelect('groupChat.messages','messages')
         .where('member.id IN (:members)', { members: id })
+        .leftJoinAndSelect('groupChat.members','members')
         .leftJoinAndSelect('groupChat.lastMessageSent','lastMessageSent')
         .orderBy('groupChat.lastMessageSentAt','DESC')
         .getMany()
