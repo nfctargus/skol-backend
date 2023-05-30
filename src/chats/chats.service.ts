@@ -30,8 +30,7 @@ export class ChatsService implements IChatsService {
             const savedMessage = await this.messageRepository.save(privateMessage);
             await this.update({id:savedChat.id,lastMessageSent:savedMessage});
         }
-        
-        return savedChat;
+        return this.getChatById(savedChat.id);
     };
     async getChats(id:number):Promise<Chat[]> {
         return this.chatRepository
