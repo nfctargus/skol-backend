@@ -6,17 +6,21 @@ import { Repository } from 'typeorm';
 import { Services } from 'utils/contants';
 import { IUserService } from 'src/users/user';
 import { CreateChatParams, FindOrCreateChatParams, UpdateChatParams } from 'utils/types';
+import { IFriendsService } from 'src/friends/friends';
 
 @Injectable()
 export class ChatsService implements IChatsService {
     constructor(@InjectRepository(Chat) private readonly chatRepository:Repository<Chat>,
                 @Inject(Services.USER) private readonly userService:IUserService,
-                @InjectRepository(PrivateMessage) private readonly messageRepository:Repository<PrivateMessage>) {}
+                @InjectRepository(PrivateMessage) private readonly messageRepository:Repository<PrivateMessage>,
+                @Inject(Services.FRIEND) private readonly friendService:IFriendsService) {}
 
     async createChat(params:CreateChatParams):Promise<Chat> {
         const {user:creator,email,message:messageContent} = params;
         const recipient = await this.userService.findUser({ email })
         if (!recipient) throw new HttpException('Recipient not found', HttpStatus.BAD_REQUEST);
+        const isFriends = await this.friendService.isFriends(creator.id,recipient.id);
+        if(!isFriends) throw new HttpException('You must be friends with this user before you can chat with them!', HttpStatus.BAD_REQUEST);
         const exists = await this.findChatByUserId(creator.id,recipient.id);
         if(exists) throw new HttpException('This chat already exists', HttpStatus.CONFLICT);
         const chat = this.chatRepository.create({creator,recipient});

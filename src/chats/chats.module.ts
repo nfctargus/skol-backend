@@ -5,9 +5,10 @@ import { Services } from 'utils/contants';
 import { Chat, PrivateMessage } from 'utils/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/users/user.module';
+import { FriendsModule } from 'src/friends/friends.module';
 
 @Module({
-    imports:[TypeOrmModule.forFeature([Chat,PrivateMessage]),UserModule],
+    imports:[TypeOrmModule.forFeature([Chat,PrivateMessage]),UserModule,FriendsModule],
     controllers: [ChatsController],
     providers: [
         {
