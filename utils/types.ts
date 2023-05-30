@@ -22,7 +22,7 @@ export interface AuthenticatedRequest extends Request {
 } 
 export type AddFriendParams = {
     user: User;
-    userId: number;
+    email: string;
 };
 export type DeleteFriendParams = {
     id:number;
