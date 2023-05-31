@@ -1,7 +1,8 @@
-import { ArrayNotEmpty, IsNotEmpty, IsString } from "class-validator";
+import { ArrayNotEmpty, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateGroupChatDto {
     @IsString()
+    @IsOptional()
     name:string;
 
     @IsString({ each: true })
@@ -9,6 +10,6 @@ export class CreateGroupChatDto {
     members: string[];
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     message:string;
 }

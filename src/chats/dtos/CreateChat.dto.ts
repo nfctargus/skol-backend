@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateChatDto {
     @IsEmail()
@@ -6,5 +6,6 @@ export class CreateChatDto {
     email:string;
 
     @IsString()
+    @IsOptional()
     message:string;
 }

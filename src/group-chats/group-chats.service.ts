@@ -20,10 +20,13 @@ export class GroupChatsService implements IGroupChatsService {
         const groupChat = this.groupChatRepository.create({name,creator,members})
         console.log(groupChat)
         const savedChat = await this.groupChatRepository.save(groupChat);
-        const groupMessage = this.groupMessageRepository.create({messageContent,groupChat,author:creator})
-        const savedMessage = await this.groupMessageRepository.save(groupMessage);
-        await this.update({id:savedChat.id,lastMessageSent:savedMessage});
-        return savedChat;
+        if(messageContent) {
+            const groupMessage = this.groupMessageRepository.create({messageContent,groupChat,author:creator})
+            const savedMessage = await this.groupMessageRepository.save(groupMessage);
+            await this.update({id:savedChat.id,lastMessageSent:savedMessage});
+        }
+        
+        return this.getGroupChatById(savedChat.id);
     }
     getGroupChats(id: number): Promise<GroupChat[]> {
         return this.groupChatRepository
