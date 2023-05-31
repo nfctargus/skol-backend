@@ -13,8 +13,8 @@ import { User } from 'utils/typeorm';
 export class FriendsService implements IFriendsService {
     constructor(@InjectRepository(Friend) private readonly friendRepository:Repository<Friend>,
                 @Inject(Services.USER) private readonly userService:IUserService) {}
-    async addFriend({user,userId}:AddFriendParams): Promise<Friend> {
-        const userTwo = await this.userService.findUser({id: userId})
+    async addFriend({user,email}:AddFriendParams): Promise<Friend> {
+        const userTwo = await this.userService.findUser({email})
         if(!userTwo) throw new HttpException("Invalid user",HttpStatus.BAD_REQUEST);
         const friends = await this.isFriends(user.id,userTwo.id);
         if(friends) throw new HttpException("Already friends",HttpStatus.CONFLICT);

@@ -6,6 +6,5 @@ export class CreateChatDto {
     email:string;
 
     @IsString()
-    @IsNotEmpty()
     message:string;
 }

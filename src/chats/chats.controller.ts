@@ -5,6 +5,7 @@ import { IChatsService } from './chats';
 import { AuthUser } from 'utils/decorators';
 import { User } from 'utils/typeorm';
 import { CreateChatDto } from './dtos/CreateChat.dto';
+import { FindOrCreateChat } from './dtos/FindOrCreateChat.dto';
 
 @Controller(Routes.CHAT)
 @UseGuards(AuthenticatedGuard)
@@ -22,5 +23,10 @@ export class ChatsController {
     @Get(':id')
     async getChatById(@Param('id') id: number) {
         return this.chatsService.getChatById(id);
+    }
+    @Post('/find')
+    async findOrCreateChat(@AuthUser() user: User,@Body() {email}:FindOrCreateChat) {
+        console.log(email)
+        return this.chatsService.findOrCreateChat({user,email});
     }
 }

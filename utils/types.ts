@@ -22,7 +22,7 @@ export interface AuthenticatedRequest extends Request {
 } 
 export type AddFriendParams = {
     user: User;
-    userId: number;
+    email: string;
 };
 export type DeleteFriendParams = {
     id:number;
@@ -31,7 +31,7 @@ export type DeleteFriendParams = {
 export type CreateChatParams = {
     user:User;
     email:string;
-    message:string;
+    message?:string;
 }
 export type CreatePrivateMessageParams = {
     messageContent:string;
@@ -62,6 +62,10 @@ export type EditGroupMessageResponse = {
 export type UpdateChatParams = {
     id:number;
     lastMessageSent:PrivateMessage;
+}
+export type FindOrCreateChatParams = {
+    user:User;
+    email:string;
 }
 export type UpdateGroupChatParams = {
     id:number;

@@ -1,15 +1,16 @@
-import { Controller, Delete, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { Routes, Services } from 'utils/contants';
 import { AuthUser } from 'utils/decorators';
 import { User } from 'utils/typeorm';
 import { IFriendsService } from './friends';
+import { AddFriendDto } from './dtos/AddFriend.dto';
 
 @Controller(Routes.FRIEND)
 export class FriendsController {
     constructor(@Inject(Services.FRIEND) private readonly friendService:IFriendsService) {}
-    @Post(':id')
-    addFriend(@AuthUser() user:User,@Param('id',ParseIntPipe) userId:number) {
-        return this.friendService.addFriend({user,userId})
+    @Post()
+    addFriend(@AuthUser() user:User,@Body() {email}:AddFriendDto) {
+        return this.friendService.addFriend({user,email});
     }
     @Get()
     getFriends(@AuthUser() user:User) {
