@@ -36,7 +36,9 @@ export class ChatsService implements IChatsService {
         return this.chatRepository
         .createQueryBuilder('chat')
         .leftJoinAndSelect('chat.creator','creator')
+        .leftJoinAndSelect('creator.profile','creatorProfile')
         .leftJoinAndSelect('chat.recipient','recipient')
+        .leftJoinAndSelect('recipient.profile','recipientProfile')
         .leftJoinAndSelect('chat.messages','messages')
         .where('creator.id = :id', { id })
         .orWhere('recipient.id = :id', { id })

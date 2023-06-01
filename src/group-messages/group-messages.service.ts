@@ -24,7 +24,7 @@ export class GroupMessagesService implements IGroupMessagesService {
     }
     getGroupMessages(id: number): Promise<GroupMessage[]> {
         return this.groupMessageRepository.find({
-            relations: ['author'],
+            relations: ['author','author.profile'],
             where: { groupChat: { id } },
             order: { createdAt: 'DESC' },
         });

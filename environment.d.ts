@@ -6,6 +6,7 @@ declare namespace NodeJS {
         MYSQL_DB_PORT?:number;
         MYSQL_DB_NAME?:string;
         COOKIE_SECRET:string;
+        PROFILE_PICTURE_PATH:string;
     }
 }
 declare namespace Express {

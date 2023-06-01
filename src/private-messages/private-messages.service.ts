@@ -25,7 +25,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
     };
     getPrivateMessages(id: number): Promise<PrivateMessage[]> {
         return this.messageRepository.find({
-            relations: ['author'],
+            relations: ['author','chat','author.profile'],
             where: { chat: { id } },
             order: { createdAt: 'DESC' },
         });

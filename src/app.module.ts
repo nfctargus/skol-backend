@@ -13,7 +13,7 @@ import { GroupMessagesModule } from './group-messages/group-messages.module';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ envFilePath: '.env.development'}),
+        ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development'}),
         AuthModule,
         UserModule, 
         FriendsModule,
