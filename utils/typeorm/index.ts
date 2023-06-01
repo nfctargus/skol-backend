@@ -6,9 +6,10 @@ import { Message } from "./entities/Message";
 import { PrivateMessage } from "./entities/PrivateMessage";
 import { Session } from "./entities/Session";
 import { User } from "./entities/User";
+import { UserProfile } from "./entities/UserProfile";
 
 
-const entities = [User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage];
+const entities = [User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage,UserProfile];
 
-export { User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage };
+export { User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage,UserProfile };
 export default entities;

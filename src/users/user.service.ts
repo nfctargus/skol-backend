@@ -16,14 +16,22 @@ export class UserService implements IUserService {
         const newUser = this.userRepository.create({...userDetails,password});
         return this.userRepository.save(newUser);
     }
-    async findUser(findUserParams: FindUserParams): Promise<User> {
-        return this.userRepository.findOneBy(findUserParams);
+    async findUser({id,email,username}: FindUserParams): Promise<User> {
+        return this.userRepository.findOne({
+            where: {
+                id: id,
+                email:email,
+                username:username
+            },
+            relations: { profile: true }
+        });
     }
     searchUsers(userId:number,query: string) {
         const statement = '(user.email LIKE :query)';
         return this.userRepository
             .createQueryBuilder('user')
             .where(statement, { query: `%${query}%` })
+            .leftJoinAndSelect('user.profile','profile')
             .andWhere('id != :id', {id:userId})
             .limit(10)
             .select(['user.id','user.firstName', 'user.lastName', 'user.email', 'user.username'])

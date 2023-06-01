@@ -1,7 +1,8 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PrivateMessage } from "./PrivateMessage";
 import { GroupChat } from "./GroupChat";
+import { UserProfile } from "./UserProfile";
 
 @Entity({name: 'users'})
 export class User {
@@ -30,4 +31,8 @@ export class User {
 
     @ManyToMany(() => GroupChat,(groupChat) => groupChat.members)
     groupChats:GroupChat[];
+
+    @OneToOne(() => UserProfile, (profile) => profile.user)
+    @JoinColumn()
+    profile: UserProfile;
 }

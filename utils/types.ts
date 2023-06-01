@@ -87,3 +87,7 @@ export type CreateGroupChatParams = {
     members:string[];
     message:string;
 }
+export type CreateUserProfileParams = {
+    user:User;
+    avatar?:Express.Multer.File;
+}
