@@ -3,18 +3,20 @@ import { Routes, Services } from 'utils/contants';
 import { IPrivateMessagesService } from './private-messages';
 import { AuthUser } from 'utils/decorators';
 import { User } from 'utils/typeorm';
-import { CreatePrivateMessageParams } from 'utils/types';
 import { CreatePrivateMessageDto } from './dtos/CreatePrivateMessage.dto';
 import { EditPrivateMessageDto } from './dtos/EditPrivateMessage.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller(Routes.PRIVATE_MESSAGE)
 export class PrivateMessagesController {
-    constructor(@Inject(Services.PRIVATE_MESSAGE) private readonly messageService:IPrivateMessagesService) {}
+    constructor(@Inject(Services.PRIVATE_MESSAGE) private readonly messageService:IPrivateMessagesService,
+    private eventEmitter: EventEmitter2) {}
 
     @Post()
-    createPrivateMessage(@AuthUser() user: User,@Param('id', ParseIntPipe) id: number,@Body() {messageContent}:CreatePrivateMessageDto) {
-        console.log(messageContent)
-        return this.messageService.createPrivateMessage({messageContent,chatId:id,user})
+    async createPrivateMessage(@AuthUser() user: User,@Param('id', ParseIntPipe) id: number,@Body() {messageContent}:CreatePrivateMessageDto) {
+        const message = await this.messageService.createPrivateMessage({messageContent,chatId:id,user});
+        this.eventEmitter.emit('privateMessages-create', message);
+        return message;
     }
     @Get()
     getPrivateMessages(@AuthUser() user: User,@Param('id', ParseIntPipe) id: number) {
