@@ -1,5 +1,5 @@
 import { GroupChat } from "utils/typeorm";
-import { CreateGroupChatParams, UpdateGroupChatParams } from "utils/types";
+import { AddAvatarGroupChatParams, CreateGroupChatParams, UpdateGroupChatNameParams, UpdateGroupChatParams } from "utils/types";
 
 export interface IGroupChatsService {
     createGroupChat(params:CreateGroupChatParams):Promise<GroupChat>;
@@ -8,4 +8,6 @@ export interface IGroupChatsService {
     save(chat: GroupChat): Promise<GroupChat>;
     getChatOnly(id: number): Promise<GroupChat>;
     update(params: UpdateGroupChatParams);
+    uploadOrUpdateAvatar(params:AddAvatarGroupChatParams):Promise<GroupChat>;
+    updateGroupName(params:UpdateGroupChatNameParams):Promise<GroupChat>;
 }

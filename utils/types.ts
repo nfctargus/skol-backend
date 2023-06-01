@@ -91,3 +91,13 @@ export type CreateUserProfileParams = {
     user:User;
     avatar?:Express.Multer.File;
 }
+export type AddAvatarGroupChatParams = {
+    id:number;
+    user:User;
+    avatar?:Express.Multer.File;
+}
+export type UpdateGroupChatNameParams = {
+    user:User;
+    id:number;
+    name:string;
+}

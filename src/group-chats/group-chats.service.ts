@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IGroupChatsService } from './group-chats';
 import { GroupChat, GroupMessage } from 'utils/typeorm';
-import { CreateGroupChatParams, UpdateGroupChatParams } from 'utils/types';
+import { AddAvatarGroupChatParams, CreateGroupChatParams, UpdateGroupChatNameParams, UpdateGroupChatParams } from 'utils/types';
 import { Services } from 'utils/contants';
 import { IUserService } from 'src/users/user';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,7 +18,6 @@ export class GroupChatsService implements IGroupChatsService {
         const members = (await Promise.all(membersPromise));
         members.push(creator);
         const groupChat = this.groupChatRepository.create({name,creator,members})
-        console.log(groupChat)
         const savedChat = await this.groupChatRepository.save(groupChat);
         if(messageContent) {
             const groupMessage = this.groupMessageRepository.create({messageContent,groupChat,author:creator})
@@ -51,5 +50,19 @@ export class GroupChatsService implements IGroupChatsService {
     }
     update({id,lastMessageSent}: UpdateGroupChatParams) {
         return this.groupChatRepository.update(id,{lastMessageSent});
+    }
+    async uploadOrUpdateAvatar({id,user,avatar}: AddAvatarGroupChatParams): Promise<GroupChat> {
+        const group = await this.getGroupChatById(id);
+        if(!group) throw new HttpException('Group not found',HttpStatus.BAD_REQUEST);
+        if(group.creator.id !== user.id) throw new HttpException('Only the group creator can upload an avatar',HttpStatus.UNAUTHORIZED);
+        group.avatar = avatar.filename
+        return this.groupChatRepository.save(group);
+    }
+    async updateGroupName({id,user,name}: UpdateGroupChatNameParams): Promise<GroupChat> {
+        const group = await this.getGroupChatById(id);
+        if(!group) throw new HttpException('Group not found',HttpStatus.BAD_REQUEST);
+        if(group.creator.id !== user.id) throw new HttpException('Only the group creator can change the group name',HttpStatus.UNAUTHORIZED);
+        group.name = name;
+        return this.groupChatRepository.save(group);
     }
 }
