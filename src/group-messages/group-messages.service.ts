@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Services } from 'utils/contants';
 import { GroupMessage } from 'utils/typeorm';
 import { IGroupMessagesService } from './group-messages';
-import { CreateGroupMessageParams, CreateGroupMessageResponse, EditGroupMessageParams, EditGroupMessageResponse } from 'utils/types';
+import { CreateGroupMessageParams, CreateGroupMessageResponse, DeleteGroupMessageParams, EditGroupMessageParams, EditGroupMessageResponse } from 'utils/types';
 
 @Injectable()
 export class GroupMessagesService implements IGroupMessagesService {
@@ -24,14 +24,14 @@ export class GroupMessagesService implements IGroupMessagesService {
     }
     getGroupMessages(id: number): Promise<GroupMessage[]> {
         return this.groupMessageRepository.find({
-            relations: ['author','author.profile'],
+            relations: ['author','author.profile','groupChat'],
             where: { groupChat: { id } },
             order: { createdAt: 'DESC' },
         });
     }
     getGroupMessageById(id: number): Promise<GroupMessage> {
         return this.groupMessageRepository.findOne({
-            relations: ['author'],
+            relations: ['author','groupChat.creator','groupChat.lastMessageSent'],
             where: { id },
         });
     }
@@ -43,6 +43,24 @@ export class GroupMessagesService implements IGroupMessagesService {
         const newGroupMessage = await this.groupMessageRepository.save(groupMessage);
         return {messageId:id,message:newGroupMessage};
     }
-
-                
+    async deleteGroupMessage({id,user}: DeleteGroupMessageParams) {
+        const groupMessage = await this.getGroupMessageById(id);
+        const {groupChat} = groupMessage;
+        if(!groupMessage) throw new HttpException('Group message not found',HttpStatus.BAD_REQUEST);
+        if(groupMessage.author.id !== user.id || groupChat.creator.id !== user.id) throw new HttpException('Only the group chat creator or message author can delete messages!',HttpStatus.BAD_REQUEST);
+    
+        if(groupChat.lastMessageSent.id !== id) {
+            await this.groupMessageRepository.delete(id);
+        } else {
+            const group = await this.groupChatService.getGroupChatById(groupChat.id);
+            if(group.messages.length <= 1) {
+                await this.groupChatService.update({id: groupChat.id,lastMessageSent: null});
+                return this.groupMessageRepository.delete({ id });
+            } else {
+                const newLastMessage = group.messages[1];
+                await this.groupChatService.update({id: groupChat.id,lastMessageSent: newLastMessage});
+                return this.groupMessageRepository.delete({ id });
+            }    
+        }
+    }
 }

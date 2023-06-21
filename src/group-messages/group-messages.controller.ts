@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { Routes, Services } from 'utils/contants';
 import { AuthUser } from 'utils/decorators';
 import { User } from 'utils/typeorm';
@@ -24,5 +24,10 @@ export class GroupMessagesController {
     @Patch()
     editGroupMessage(@AuthUser() user:User,@Body() {messageId,messageContent}:EditGroupMessageDto) {
         return this.groupMessageService.editGroupMessage({user,id:messageId,messageContent})
+    }
+    @Delete(':id')
+    async deleteGroupMessage(@AuthUser() user:User,@Param('id',ParseIntPipe) id:number) {
+        await this.groupMessageService.deleteGroupMessage({user,id});
+        return {messageId: id};
     }
 }

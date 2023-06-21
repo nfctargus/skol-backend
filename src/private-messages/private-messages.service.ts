@@ -32,7 +32,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
     }; 
     getPrivateMessageById(id: number): Promise<PrivateMessage> {
         return this.messageRepository.findOne({
-            relations: ['author'],
+            relations: ['author','chat.lastMessageSent'],
             where: { id },
         });
     }
@@ -46,9 +46,23 @@ export class PrivateMessagesService implements IPrivateMessagesService {
     }
     async deletePrivateMessage({id,user}: DeletePrivateMessageParams) {
         const message = await this.getPrivateMessageById(id);
+        const {chat} = message;
         if(!message) throw new HttpException('Message not found!',HttpStatus.BAD_REQUEST);
         if(message.author.id !== user.id) throw new HttpException('You cannot delete another users message!',HttpStatus.BAD_REQUEST);
-        await this.messageRepository.delete(message.id);
-        return {messageId: id};
+
+        if(chat.lastMessageSent.id !== id) {
+            await this.messageRepository.delete(id);
+        } else {
+            const chatToUpdate = await this.chatService.getChatById(chat.id);
+            if(chatToUpdate.messages.length <= 1) {
+                console.log('Setting last message to null');
+                await this.chatService.update({id: chat.id,lastMessageSent: null});
+                return this.messageRepository.delete({ id });
+            } else {
+                const newLastMessage = chatToUpdate.messages[1];
+                await this.chatService.update({id: chat.id,lastMessageSent: newLastMessage});
+                return this.messageRepository.delete({ id });
+            }    
+        }
     }
 }

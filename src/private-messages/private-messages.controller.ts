@@ -31,7 +31,8 @@ export class PrivateMessagesController {
         return this.messageService.editPrivateMessage({user,id:messageId,messageContent})
     }
     @Delete(':id')
-    deletePrivateMessage(@AuthUser() user:User,@Param('id',ParseIntPipe) id:number) {
-        return this.messageService.deletePrivateMessage({user,id});
+    async deletePrivateMessage(@AuthUser() user:User,@Param('id',ParseIntPipe) id:number) {
+        await this.messageService.deletePrivateMessage({user,id});
+        return {messageId: id};
     }
 }

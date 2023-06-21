@@ -105,3 +105,7 @@ export type DeletePrivateMessageParams = {
     user:User;
     id:number;
 }
+export type DeleteGroupMessageParams = {
+    user:User;
+    id:number;
+}
