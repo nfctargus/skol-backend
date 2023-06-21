@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IPrivateMessagesService } from './private-messages';
-import { CreatePrivateMessageResponse, CreatePrivateMessageParams, EditPrivateMessageResponse, EditPrivateMessageParams } from 'utils/types';
+import { CreatePrivateMessageResponse, CreatePrivateMessageParams, EditPrivateMessageResponse, EditPrivateMessageParams, DeletePrivateMessageParams } from 'utils/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PrivateMessage } from 'utils/typeorm';
 import { Repository } from 'typeorm';
@@ -43,5 +43,12 @@ export class PrivateMessagesService implements IPrivateMessagesService {
         message.messageContent = messageContent;
         const newMessage = await this.messageRepository.save(message);
         return {messageId: id,message:newMessage};
+    }
+    async deletePrivateMessage({id,user}: DeletePrivateMessageParams) {
+        const message = await this.getPrivateMessageById(id);
+        if(!message) throw new HttpException('Message not found!',HttpStatus.BAD_REQUEST);
+        if(message.author.id !== user.id) throw new HttpException('You cannot delete another users message!',HttpStatus.BAD_REQUEST);
+        await this.messageRepository.delete(message.id);
+        return {messageId: id};
     }
 }

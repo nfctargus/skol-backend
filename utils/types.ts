@@ -101,3 +101,7 @@ export type UpdateGroupChatNameParams = {
     id:number;
     name:string;
 }
+export type DeletePrivateMessageParams = {
+    user:User;
+    id:number;
+}

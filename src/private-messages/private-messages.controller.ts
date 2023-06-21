@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { Routes, Services } from 'utils/contants';
 import { IPrivateMessagesService } from './private-messages';
 import { AuthUser } from 'utils/decorators';
@@ -29,5 +29,9 @@ export class PrivateMessagesController {
     @Patch()
     editPrivateMessage(@AuthUser() user:User,@Body() {messageId,messageContent}:EditPrivateMessageDto) {
         return this.messageService.editPrivateMessage({user,id:messageId,messageContent})
+    }
+    @Delete(':id')
+    deletePrivateMessage(@AuthUser() user:User,@Param('id',ParseIntPipe) id:number) {
+        return this.messageService.deletePrivateMessage({user,id});
     }
 }
