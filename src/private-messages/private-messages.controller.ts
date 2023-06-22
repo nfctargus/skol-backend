@@ -15,7 +15,7 @@ export class PrivateMessagesController {
     @Post()
     async createPrivateMessage(@AuthUser() user: User,@Param('id', ParseIntPipe) id: number,@Body() {messageContent}:CreatePrivateMessageDto) {
         const message = await this.messageService.createPrivateMessage({messageContent,chatId:id,user});
-        this.eventEmitter.emit('privateMessages-create', message);
+        this.eventEmitter.emit('newPrivateMessage', message);
         return message;
     }
     @Get()
