@@ -2,30 +2,31 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { CreatePrivateMessageResponse } from "utils/types";
 import { Socket,Server } from 'socket.io';
 import { OnEvent } from "@nestjs/event-emitter";
-import { Logger } from "@nestjs/common";
-import { UserSocket } from "utils/interfaces";
+import { Inject, Logger } from "@nestjs/common";
+import { ISessionStore } from "utils/interfaces";
 import { PrivateMessage } from "utils/typeorm";
-
+import { Services } from "utils/contants";
 @WebSocketGateway({cors: {origin: ['http://localhost:3000'],credentials: true}})
 export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
+    constructor(@Inject(Services.GATEWAY_SESSION_STORE) private readonly sessions:ISessionStore) {}
+    
     @WebSocketServer() server: Server = new Server();
     private logger = new Logger('ChatGateway');
 
-    handleConnection(client: Socket, ...args: any[]) {
+    async handleConnection(client: Socket, ...args: any[]) {
+        this.sessions.saveSession(client.id,client);
+        
     }
     handleDisconnect(client: Socket) {
-
+        this.sessions.deleteSession(client.id)
     }  
-
+    
     @OnEvent('newPrivateMessage')
-    async handleEvent(@MessageBody() payload: PrivateMessage,@ConnectedSocket() client:Socket) {
+    async handlePrivateMessageEvent(@MessageBody() payload: PrivateMessage) {
         //this.logger.log(payload);
         const {chat} = payload;
-        //this.server.emit('chat', payload); // broadcast messages
         this.server.to(`chat-${chat.id}`).emit('newPrivateMessage', payload)
-        //client.to(`chat-${chat.id}`).emit('newPrivateMessage', payload)
-        console.log(client)
     }
 
     @SubscribeMessage('newChatConnection')

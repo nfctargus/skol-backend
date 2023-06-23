@@ -1,5 +1,8 @@
 import { Socket } from 'socket.io';
 
-export interface UserSocket extends Socket {
-    username?:string;
+export interface ISessionStore {
+    findSession(id:string):Socket;
+    saveSession(id:string,socket:Socket);
+    findAllSessions():Socket[];
+    deleteSession(id:string);
 }
