@@ -32,7 +32,7 @@ export class PrivateMessagesService implements IPrivateMessagesService {
     }; 
     getPrivateMessageById(id: number): Promise<PrivateMessage> {
         return this.messageRepository.findOne({
-            relations: ['author','chat.lastMessageSent'],
+            relations: ['author','chat.lastMessageSent','author.profile'],
             where: { id },
         });
     }

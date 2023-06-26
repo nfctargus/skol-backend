@@ -55,7 +55,6 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         const chat = await this.chatService.getChatById(chatId);
         if(!client.user) return;
         const recipient = chat.recipient.id === client.user.id ? chat.creator : chat.recipient
-        console.log(client.user);
         this.server.to(`private-chat-${recipient.id}`).emit('messageEdited', {messageId,messageContent,chat}); 
     }
 
