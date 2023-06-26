@@ -1,10 +1,11 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { DeletePrivateMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
+import { CreateGroupMessageResponse, DeletePrivateMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
 import { Socket,Server } from 'socket.io';
 import { Inject, Logger } from "@nestjs/common";
 import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
 import { Services } from "utils/contants";
 import { IChatsService } from "src/chats/chats";
+import { GroupChat, GroupMessage, User } from "utils/typeorm";
 @WebSocketGateway({cors: {origin: ['http://localhost:3000'],credentials: true}})
 export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
@@ -57,21 +58,29 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         const recipient = chat.recipient.id === client.user.id ? chat.creator : chat.recipient
         this.server.to(`private-chat-${recipient.id}`).emit('messageEdited', {messageId,messageContent,chat}); 
     }
-
-    @SubscribeMessage('newChatConnection')
-    onClientConnect(@MessageBody() data:any, @ConnectedSocket() client:Socket) {
+    @SubscribeMessage('newGroupMessage')
+    async groupMessageEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {chat,message}:CreateGroupMessageResponse) {
+        if(!client.user) return;
+        chat.members.map((member) => {
+            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageReceived', {message}); 
+        })
+        //console.log(groupChat)
+        //this.server.to(`private-chat-${recipientId}`).emit('messageReceived', {message,chat}); 
+    }
+    @SubscribeMessage('joinedGroupChat')
+    onClientConnect(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() data:any) {
         
-        const { id } = data;
-        client.join(`chat-${id}`);
+        console.log(data);
+        
         //client.join(`conversation-${data.conversationId}`);
         console.log("Connected to Rooms: ")
         console.log(client.rooms);
         //client.to(`conversation-${data.conversationId}`).emit('userJoin');
     }
-    @SubscribeMessage('newChatDisconnect')
-    onClientDisconnect(@MessageBody() data:any, @ConnectedSocket() client:Socket) {
+    @SubscribeMessage('leftGroupChat')
+    onClientDisconnect(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() data:any) {
         const { id } = data;
-        client.leave(`chat-${id}`);
+        client.leave(`group-chat-${id}`);
         console.log("Disconnected")
         console.log(client.rooms);
     }
