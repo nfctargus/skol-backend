@@ -42,7 +42,8 @@ export class PrivateMessagesService implements IPrivateMessagesService {
         if(message.author.id !== user.id) throw new HttpException('You cannot edit another users message!',HttpStatus.BAD_REQUEST);
         message.messageContent = messageContent;
         const newMessage = await this.messageRepository.save(message);
-        return {messageId: id,message:newMessage};
+        const updatedChat = await this.chatService.getChatById(newMessage.chat.id);
+        return {messageId: id,message:newMessage,updatedChat};
     }
     async deletePrivateMessage({id,user}: DeletePrivateMessageParams) {
         const message = await this.getPrivateMessageById(id);

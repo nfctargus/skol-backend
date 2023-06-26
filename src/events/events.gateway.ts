@@ -1,5 +1,5 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { PrivateMessageEventParams } from "utils/types";
+import { DeletePrivateMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
 import { Socket,Server } from 'socket.io';
 import { Inject, Logger } from "@nestjs/common";
 import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
@@ -41,15 +41,22 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         if(client.user) this.sessions.deleteSession(client.user.id)
     }  
     @SubscribeMessage('newPrivateMessage')
-    async privateMessageEvent(@MessageBody() {message,chat,recipientId}:PrivateMessageEventParams) {
+    async privateMessageEvent(@MessageBody() {message,chat,recipientId}:NewPrivateMessageEventParams) {
         this.server.to(`private-chat-${recipientId}`).emit('messageReceived', {message,chat}); 
     }
     @SubscribeMessage('privateMessageDeleted')
-    async privateMessageDeletedEvent(@MessageBody() {messageId,chatId,userId}) {
+    async privateMessageDeletedEvent(@MessageBody() {messageId,chatId,userId}:DeletePrivateMessageEventParams) {
         const chat = await this.chatService.getChatById(chatId);
         const recipient = chat.recipient.id === userId ? chat.creator : chat.recipient
-        console.log(recipient)
         this.server.to(`private-chat-${recipient.id}`).emit('messageDeleted', {messageId}); 
+    }
+    @SubscribeMessage('privateMessageEdited')
+    async privateMessageEditedEvent(@ConnectedSocket() client:AuthenticatedSocket, @MessageBody() {messageId,chatId,messageContent}) {
+        const chat = await this.chatService.getChatById(chatId);
+        if(!client.user) return;
+        const recipient = chat.recipient.id === client.user.id ? chat.creator : chat.recipient
+        console.log(client.user);
+        this.server.to(`private-chat-${recipient.id}`).emit('messageEdited', {messageId,messageContent,chat}); 
     }
 
     @SubscribeMessage('newChatConnection')
