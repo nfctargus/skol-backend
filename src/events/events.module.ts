@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
 import { Services } from 'utils/contants';
 import { SessionStore } from './sessionStore';
-import { UserModule } from 'src/users/user.module';
+import { ChatsModule } from 'src/chats/chats.module';
+
 
 @Module({
-    imports:[UserModule],
+    imports:[ChatsModule],
     providers: [
         EventsGateway,
         {

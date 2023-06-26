@@ -1,17 +1,15 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { CreatePrivateMessageResponse, PrivateMessageEventParams } from "utils/types";
+import { PrivateMessageEventParams } from "utils/types";
 import { Socket,Server } from 'socket.io';
-import { OnEvent } from "@nestjs/event-emitter";
 import { Inject, Logger } from "@nestjs/common";
 import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
-import { PrivateMessage } from "utils/typeorm";
 import { Services } from "utils/contants";
-import { IUserService } from "src/users/user";
+import { IChatsService } from "src/chats/chats";
 @WebSocketGateway({cors: {origin: ['http://localhost:3000'],credentials: true}})
 export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
     constructor(@Inject(Services.GATEWAY_SESSION_STORE) private readonly sessions:ISessionStore,
-                @Inject(Services.USER) private readonly userService:IUserService) {}
+                @Inject(Services.CHAT) private readonly chatService:IChatsService) {}
     
     @WebSocketServer() server: Server = new Server();
     private logger = new Logger('ChatGateway');
@@ -43,8 +41,15 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         if(client.user) this.sessions.deleteSession(client.user.id)
     }  
     @SubscribeMessage('newPrivateMessage')
-    async privateMessage(@MessageBody() {message,chat,recipientId}:PrivateMessageEventParams) {
+    async privateMessageEvent(@MessageBody() {message,chat,recipientId}:PrivateMessageEventParams) {
         this.server.to(`private-chat-${recipientId}`).emit('messageReceived', {message,chat}); 
+    }
+    @SubscribeMessage('privateMessageDeleted')
+    async privateMessageDeletedEvent(@MessageBody() {messageId,chatId,userId}) {
+        const chat = await this.chatService.getChatById(chatId);
+        const recipient = chat.recipient.id === userId ? chat.creator : chat.recipient
+        console.log(recipient)
+        this.server.to(`private-chat-${recipient.id}`).emit('messageDeleted', {messageId}); 
     }
 
     @SubscribeMessage('newChatConnection')
