@@ -109,3 +109,8 @@ export type DeleteGroupMessageParams = {
     user:User;
     id:number;
 }
+export type PrivateMessageEventParams = {
+    message:PrivateMessage;
+    chat:Chat;
+    recipientId:number;
+}
