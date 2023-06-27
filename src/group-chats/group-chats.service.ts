@@ -48,8 +48,9 @@ export class GroupChatsService implements IGroupChatsService {
     getChatOnly(id: number): Promise<GroupChat> {
         throw new Error('Method not implemented.');
     }
-    update({id,lastMessageSent}: UpdateGroupChatParams) {
-        return this.groupChatRepository.update(id,{lastMessageSent});
+    async update({id,lastMessageSent}: UpdateGroupChatParams) {
+        await this.groupChatRepository.update(id,{lastMessageSent});
+        return this.getGroupChatById(id);
     }
     async uploadOrUpdateAvatar({id,user,avatar}: AddAvatarGroupChatParams): Promise<GroupChat> {
         const group = await this.getGroupChatById(id);

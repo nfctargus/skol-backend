@@ -15,7 +15,8 @@ export async function compareHash(rawPassword:string,hashedPassword:string) {
     //return bcrypt.compare(rawPassword, hashedPassword);
 }
 export const multerConfig = {
-    dest: 'C:/Code/chat-app-kl/chat-app-frontend/public/images'
+    //dest: 'C:/Code/chat-app-kl/chat-app-frontend/public/images'
+    dest: 'D:/File Storage/Code/Web Dev/kierans-chat-app/chat-app-frontend/public/images'
 };
 
 export const multerOptions = {

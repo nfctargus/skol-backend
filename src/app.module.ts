@@ -11,12 +11,10 @@ import { PrivateMessagesModule } from './private-messages/private-messages.modul
 import { GroupChatsModule } from './group-chats/group-chats.module';
 import { GroupMessagesModule } from './group-messages/group-messages.module';
 import { EventsModule } from './events/events.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development'}),
-        EventEmitterModule.forRoot(),
         AuthModule,
         UserModule, 
         FriendsModule,

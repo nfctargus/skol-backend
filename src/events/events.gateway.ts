@@ -1,5 +1,5 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { DeletePrivateMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
+import { CreateGroupMessageResponse, DeletePrivateMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
 import { Socket,Server } from 'socket.io';
 import { Inject, Logger } from "@nestjs/common";
 import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
@@ -26,6 +26,7 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
         if(client.user) {
             client.join(`private-chat-${client.user.id}`)
+            console.log(client.rooms);
             this.sessions.saveSession(client.user.id,client);
 
             /* this.server.on("connection", (client:AuthenticatedSocket) => {
@@ -43,6 +44,13 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
     @SubscribeMessage('newPrivateMessage')
     async privateMessageEvent(@MessageBody() {message,chat,recipientId}:NewPrivateMessageEventParams) {
         this.server.to(`private-chat-${recipientId}`).emit('messageReceived', {message,chat}); 
+    }
+    @SubscribeMessage('newGroupMessage')
+    async groupMessageEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {chat,message}:CreateGroupMessageResponse) {
+        if(!client.user) return;
+        chat.members.map((member => {
+            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageReceived', {message,chat})
+        }));
     }
     @SubscribeMessage('privateMessageDeleted')
     async privateMessageDeletedEvent(@MessageBody() {messageId,chatId,userId}:DeletePrivateMessageEventParams) {
