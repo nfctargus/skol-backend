@@ -1,16 +1,18 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { CreateGroupMessageResponse, DeletePrivateMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
-import { Socket,Server } from 'socket.io';
+import { CreateGroupMessageResponse, DeleteMessageEventParams, EditMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
+import { Server } from 'socket.io';
 import { Inject, Logger } from "@nestjs/common";
 import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
 import { Services } from "utils/contants";
 import { IChatsService } from "src/chats/chats";
-import { GroupChat, GroupMessage, User } from "utils/typeorm";
+import { IGroupChatsService } from "src/group-chats/group-chats";
 @WebSocketGateway({cors: {origin: ['http://localhost:3000'],credentials: true}})
 export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
     constructor(@Inject(Services.GATEWAY_SESSION_STORE) private readonly sessions:ISessionStore,
-                @Inject(Services.CHAT) private readonly chatService:IChatsService) {}
+                @Inject(Services.CHAT) private readonly chatService:IChatsService,
+                @Inject(Services.GROUP) private readonly groupChatService:IGroupChatsService) {}
+                
     
     @WebSocketServer() server: Server = new Server();
     private logger = new Logger('ChatGateway');
@@ -53,27 +55,34 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
             if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageReceived', {message,chat})
         }));
     }
+    @SubscribeMessage('onGroupMessageDeletion')
+    async groupMessageDeletedEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {messageId,chatId,userId}:DeleteMessageEventParams) {
+        const groupChat = await this.groupChatService.getGroupChatById(chatId);
+        if(!client.user) return;
+        groupChat.members.map((member => {
+            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageDeleted', {messageId});
+        }));
+    }
+    @SubscribeMessage('onGroupMessageEdit')
+    async groupMessageEditedEvent(@ConnectedSocket() client:AuthenticatedSocket, @MessageBody() {messageId,chatId,messageContent}:EditMessageEventParams) {
+        const groupChat = await this.groupChatService.getGroupChatById(chatId);
+        if(!client.user) return;
+        groupChat.members.map((member => {
+            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageEdited', {messageId,messageContent,groupChat});
+        }));
+    }
     @SubscribeMessage('privateMessageDeleted')
-    async privateMessageDeletedEvent(@MessageBody() {messageId,chatId,userId}:DeletePrivateMessageEventParams) {
+    async privateMessageDeletedEvent(@MessageBody() {messageId,chatId,userId}:DeleteMessageEventParams) {
         const chat = await this.chatService.getChatById(chatId);
         const recipient = chat.recipient.id === userId ? chat.creator : chat.recipient
         this.server.to(`private-chat-${recipient.id}`).emit('messageDeleted', {messageId}); 
     }
     @SubscribeMessage('privateMessageEdited')
-    async privateMessageEditedEvent(@ConnectedSocket() client:AuthenticatedSocket, @MessageBody() {messageId,chatId,messageContent}) {
+    async privateMessageEditedEvent(@ConnectedSocket() client:AuthenticatedSocket, @MessageBody() {messageId,chatId,messageContent}:EditMessageEventParams) {
         const chat = await this.chatService.getChatById(chatId);
         if(!client.user) return;
         const recipient = chat.recipient.id === client.user.id ? chat.creator : chat.recipient
         this.server.to(`private-chat-${recipient.id}`).emit('messageEdited', {messageId,messageContent,chat}); 
-    }
-    @SubscribeMessage('newGroupMessage')
-    async groupMessageEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {chat,message}:CreateGroupMessageResponse) {
-        if(!client.user) return;
-        chat.members.map((member) => {
-            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageReceived', {message}); 
-        })
-        //console.log(groupChat)
-        //this.server.to(`private-chat-${recipientId}`).emit('messageReceived', {message,chat}); 
     }
     @SubscribeMessage('joinedGroupChat')
     onClientConnect(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() data:any) {
@@ -92,4 +101,5 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         console.log("Disconnected")
         console.log(client.rooms);
     }
+    
 }

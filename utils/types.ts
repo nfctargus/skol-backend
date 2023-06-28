@@ -59,6 +59,7 @@ export type EditPrivateMessageResponse = {
 export type EditGroupMessageResponse = {
     messageId:number;
     message:GroupMessage;
+    updatedChat:GroupChat;
 }
 export type UpdateChatParams = {
     id:number;
@@ -115,13 +116,13 @@ export type NewPrivateMessageEventParams = {
     chat:Chat;
     recipientId:number;
 }
-export type DeletePrivateMessageEventParams = {
+export type DeleteMessageEventParams = {
     messageId:number;
     chatId:number;
     userId:number;
 }
-export type EditPrivateMessageEventParams = {
-    message:PrivateMessage;
-    chat:Chat;
-    recipientId:number;
+export type EditMessageEventParams = {
+    messageId:number;
+    chatId:number;
+    messageContent:string;
 }
