@@ -67,7 +67,7 @@ export class ChatsService implements IChatsService {
         return this.chatRepository.save(chat);
     } 
     async getChatOnly(id:number):Promise<Chat> {
-        return this.chatRepository.findOne({where: [{id}],relations: ['creator','recipient']});
+        return this.chatRepository.findOne({where: [{id}],relations: ['creator','recipient','creator.profile','recipient.profile']});
     }
     update({ id, lastMessageSent }:UpdateChatParams) {
         return this.chatRepository.update(id, { lastMessageSent });

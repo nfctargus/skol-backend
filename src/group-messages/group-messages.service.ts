@@ -20,7 +20,8 @@ export class GroupMessagesService implements IGroupMessagesService {
         const savedMessage = await this.groupMessageRepository.save(groupMessage);
         groupChat.lastMessageSent = savedMessage;
         const updatedChat = await this.groupChatService.update(groupChat);
-        return { message:groupMessage,chat:updatedChat };
+        const savedGroupMessage = await this.getGroupMessageById(groupMessage.id);
+        return { message:savedGroupMessage,chat:updatedChat };
     }
     getGroupMessages(id: number): Promise<GroupMessage[]> {
         return this.groupMessageRepository.find({
@@ -31,7 +32,7 @@ export class GroupMessagesService implements IGroupMessagesService {
     }
     getGroupMessageById(id: number): Promise<GroupMessage> {
         return this.groupMessageRepository.findOne({
-            relations: ['author','groupChat.creator','groupChat.lastMessageSent'],
+            relations: ['author','author.profile','groupChat.creator','groupChat.lastMessageSent','groupChat.members','groupChat.members.profile'],
             where: { id },
         });
     }
