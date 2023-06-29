@@ -1,4 +1,4 @@
-import { Chat, GroupChat, GroupMessage, PrivateMessage, User } from "./typeorm";
+import { Chat, Friend, GroupChat, GroupMessage, PrivateMessage, User } from "./typeorm";
 import { Message } from "./typeorm/entities/Message";
 
 export type CreateUserParams = {
@@ -136,4 +136,9 @@ export type EditGroupChatMemberEventParams = {
     groupId:number;
     userId?:number;
     users?:number[];
+}
+export type EditFriendsEventParams = {
+    data:Friend;
+    friendId:number;
+    id?:number;
 }

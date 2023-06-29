@@ -25,7 +25,8 @@ export class FriendsService implements IFriendsService {
         const friends = await this.isFriends(id,friendId)
         if(!friends) throw new HttpException("You are not friends with this user.",HttpStatus.BAD_REQUEST);
         await this.friendRepository.delete({id:friends.id});
-        return {id: friendId}
+        
+        return {id: friendId,friendId:friends.id}
     }
     getFriends(user:User): Promise<Friend[]> {
         return this.friendRepository.find({

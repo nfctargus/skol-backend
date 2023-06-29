@@ -1,5 +1,5 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { CreateGroupMessageResponse, DeleteMessageEventParams, EditGroupChatMemberEventParams, EditMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
+import { CreateGroupMessageResponse, DeleteMessageEventParams, EditFriendsEventParams, EditGroupChatMemberEventParams, EditMessageEventParams, NewPrivateMessageEventParams } from "utils/types";
 import { Server } from 'socket.io';
 import { Inject, Logger } from "@nestjs/common";
 import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
@@ -48,11 +48,11 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         if(client.user) this.sessions.deleteSession(client.user.id)
     }  
     @SubscribeMessage('newPrivateMessage')
-    async privateMessageEvent(@MessageBody() {message,chat,recipientId}:NewPrivateMessageEventParams) {
+    privateMessageEvent(@MessageBody() {message,chat,recipientId}:NewPrivateMessageEventParams) {
         this.server.to(`private-chat-${recipientId}`).emit('messageReceived', {message,chat}); 
     }
     @SubscribeMessage('newGroupMessage')
-    async groupMessageEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {chat,message}:CreateGroupMessageResponse) {
+    groupMessageEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {chat,message}:CreateGroupMessageResponse) {
         if(!client.user) return;
         chat.members.map((member => {
             if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageReceived', {message,chat})
@@ -110,5 +110,17 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
             if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageMemberRemoved', {groupId});
         }));
         this.server.to(`private-chat-${userId}`).emit('groupMessageMemberRemoved', {groupId});
+    }
+    @SubscribeMessage('onFriendAdded')
+    friendAddEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {data}:EditFriendsEventParams) {
+        if(!client.user) return;
+        const friendId = data.userOne.id === client.user.id ? data.userTwo.id : data.userOne.id;
+        console.log(friendId)
+        this.server.to(`private-chat-${friendId}`).emit('friendAdded', {data}); 
+    }
+    @SubscribeMessage('onFriendRemoved')
+    friendRemoveEvent(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {id,friendId}:EditFriendsEventParams) {
+        if(!client.user) return;
+        this.server.to(`private-chat-${id}`).emit('friendRemoved', {friendId});
     }
 }
