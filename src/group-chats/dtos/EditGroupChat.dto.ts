@@ -4,4 +4,7 @@ export class EditGroupChatDto {
     @IsString()
     @IsOptional()
     name?:string;
+
+    @IsOptional()
+    userId?:number;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/auth/utils/local-auth.guard';
 import { Routes, Services } from 'utils/contants';
 import { AuthUser } from 'utils/decorators';
@@ -34,6 +34,14 @@ export class GroupChatsController {
     @Post(':id/update')
     updateGroupName(@Param('id') id: number,@AuthUser() user:User,@Body() {name}:EditGroupChatDto) {
         return this.groupChatService.updateGroupName({id,user,name});
+    }
+    @Delete(':id/members/remove')
+    removeGroupMember(@Param('id') groupId:number,@AuthUser() user:User,@Body() {userId}:EditGroupChatDto) {
+        return this.groupChatService.removeGroupChatUser({groupId,userId,user});
+    }
+    @Put(':id/members/add')
+    addGroupMember(@Param('id') groupId:number,@AuthUser() user:User,@Body() {userId}:EditGroupChatDto) {
+        return this.groupChatService.addGroupChatUser({groupId,userId,user});
     }
 
 }

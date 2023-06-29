@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IGroupChatsService } from './group-chats';
 import { GroupChat, GroupMessage } from 'utils/typeorm';
-import { AddAvatarGroupChatParams, CreateGroupChatParams, UpdateGroupChatNameParams, UpdateGroupChatParams } from 'utils/types';
+import { AddAvatarGroupChatParams, CreateGroupChatParams, ModifyGroupChatMemberParams, UpdateGroupChatNameParams, UpdateGroupChatParams } from 'utils/types';
 import { Services } from 'utils/contants';
 import { IUserService } from 'src/users/user';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -65,5 +65,22 @@ export class GroupChatsService implements IGroupChatsService {
         if(group.creator.id !== user.id) throw new HttpException('Only the group creator can change the group name',HttpStatus.UNAUTHORIZED);
         group.name = name;
         return this.groupChatRepository.save(group);
+    }
+    async removeGroupChatUser({groupId,userId,user}:ModifyGroupChatMemberParams):Promise<GroupChat> {
+        const groupChat = await this.getGroupChatById(groupId);
+        if(groupChat.creator.id === userId) throw new HttpException('You cannot remove the group creator from the group',HttpStatus.BAD_REQUEST);
+        if(groupChat.creator.id !== user.id) throw new HttpException('Only the group owner can remove other members',HttpStatus.BAD_REQUEST);
+        if(groupChat.members.length <= 2)throw new HttpException('Group minimum size has been reached.',HttpStatus.BAD_REQUEST);
+        const updatedMembers = groupChat.members.filter((member) => member.id !== userId);
+        groupChat.members = updatedMembers;
+        return this.groupChatRepository.save(groupChat);
+    }
+    async addGroupChatUser({groupId,userId,user}:ModifyGroupChatMemberParams):Promise<GroupChat> {
+        const groupChat = await this.getGroupChatById(groupId);
+        if(groupChat.creator.id !== user.id) throw new HttpException('Only the group owner can add members',HttpStatus.BAD_REQUEST);
+        if(groupChat.members.find((member) => member.id === userId)) throw new HttpException('User is already in this group',HttpStatus.BAD_REQUEST);
+        const newUser = await this.userService.findUser({id:userId});
+        groupChat.members.push(newUser)
+        return this.groupChatRepository.save(groupChat);
     }
 }

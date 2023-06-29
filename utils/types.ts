@@ -126,3 +126,8 @@ export type EditMessageEventParams = {
     chatId:number;
     messageContent:string;
 }
+export type ModifyGroupChatMemberParams = {
+    groupId:number;
+    userId:number;
+    user:User;
+}
