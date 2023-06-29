@@ -131,3 +131,7 @@ export type ModifyGroupChatMemberParams = {
     userId:number;
     user:User;
 }
+export type EditGroupChatMemberEventParams = {
+    groupId:number;
+    userId:number;
+}
