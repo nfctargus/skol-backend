@@ -35,13 +35,13 @@ export class GroupChatsController {
     updateGroupName(@Param('id') id: number,@AuthUser() user:User,@Body() {name}:EditGroupChatDto) {
         return this.groupChatService.updateGroupName({id,user,name});
     }
-    @Delete(':id/members/remove')
-    removeGroupMember(@Param('id') groupId:number,@AuthUser() user:User,@Body() {userId}:EditGroupChatDto) {
+    @Post(':id/members/remove')
+    removeGroupMember(@Param('id') groupId:number,@Body() {userId}:EditGroupChatDto,@AuthUser() user:User) {
         return this.groupChatService.removeGroupChatUser({groupId,userId,user});
     }
     @Put(':id/members/add')
-    addGroupMember(@Param('id') groupId:number,@AuthUser() user:User,@Body() {userId}:EditGroupChatDto) {
-        return this.groupChatService.addGroupChatUser({groupId,userId,user});
+    addGroupMember(@Param('id') groupId:number,@AuthUser() user:User,@Body() {users}:EditGroupChatDto) {
+        return this.groupChatService.addGroupChatUser({groupId,users,user});
     }
 
 }

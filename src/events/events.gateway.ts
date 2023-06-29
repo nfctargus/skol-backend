@@ -94,19 +94,21 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         await this.userService.updateUserPresence(client.user.id,"Away");
     }
     @SubscribeMessage('onGroupChatMemberAdd')
-    async groupChatMemberAdd(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {groupId,userId}:EditGroupChatMemberEventParams) {
+    async groupChatMemberAdd(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {groupId}:EditGroupChatMemberEventParams) {
         const groupChat = await this.groupChatService.getGroupChatById(groupId);
         if(!client.user) return;
         groupChat.members.map((member => {
-            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageMemberAdded', {groupId,userId});
+            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageMemberAdded', {groupId,groupChat});
         }));
     }
     @SubscribeMessage('onGroupChatMemberRemove')
     async groupChatMemberRemove(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {groupId,userId}:EditGroupChatMemberEventParams) {
         const groupChat = await this.groupChatService.getGroupChatById(groupId);
+        
         if(!client.user) return;
         groupChat.members.map((member => {
-            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageMemberRemoved', {groupId,userId});
+            if(member.id !== client.user.id) this.server.to(`private-chat-${member.id}`).emit('groupMessageMemberRemoved', {groupId});
         }));
+        this.server.to(`private-chat-${userId}`).emit('groupMessageMemberRemoved', {groupId});
     }
 }

@@ -75,12 +75,14 @@ export class GroupChatsService implements IGroupChatsService {
         groupChat.members = updatedMembers;
         return this.groupChatRepository.save(groupChat);
     }
-    async addGroupChatUser({groupId,userId,user}:ModifyGroupChatMemberParams):Promise<GroupChat> {
+    async addGroupChatUser({groupId,users,user}:ModifyGroupChatMemberParams):Promise<GroupChat> {
         const groupChat = await this.getGroupChatById(groupId);
         if(groupChat.creator.id !== user.id) throw new HttpException('Only the group owner can add members',HttpStatus.BAD_REQUEST);
-        if(groupChat.members.find((member) => member.id === userId)) throw new HttpException('User is already in this group',HttpStatus.BAD_REQUEST);
-        const newUser = await this.userService.findUser({id:userId});
-        groupChat.members.push(newUser)
+        const userPromise = users.map((user) => {
+            if(groupChat.members.find((member) => member.id === user)) throw new HttpException('User is already in this group',HttpStatus.BAD_REQUEST);
+            return this.userService.findUser({id:user});
+        });
+        (await Promise.all(userPromise)).map((user) => groupChat.members.push(user))
         return this.groupChatRepository.save(groupChat);
     }
 }

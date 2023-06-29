@@ -128,10 +128,12 @@ export type EditMessageEventParams = {
 }
 export type ModifyGroupChatMemberParams = {
     groupId:number;
-    userId:number;
+    userId?:number;
     user:User;
+    users?:number[];
 }
 export type EditGroupChatMemberEventParams = {
     groupId:number;
-    userId:number;
+    userId?:number;
+    users?:number[];
 }

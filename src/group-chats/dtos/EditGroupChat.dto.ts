@@ -7,4 +7,7 @@ export class EditGroupChatDto {
 
     @IsOptional()
     userId?:number;
+
+    @IsOptional()
+    users?:number[];
 }
