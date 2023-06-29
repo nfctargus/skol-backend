@@ -35,4 +35,7 @@ export class User {
     @OneToOne(() => UserProfile, (profile) => profile.user)
     @JoinColumn()
     profile: UserProfile;
+
+    @Column({nullable: true,default:"Offline"})
+    presence:string;
 }

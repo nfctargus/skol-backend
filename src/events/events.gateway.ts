@@ -6,12 +6,14 @@ import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
 import { Services } from "utils/contants";
 import { IChatsService } from "src/chats/chats";
 import { IGroupChatsService } from "src/group-chats/group-chats";
+import { IUserService } from "src/users/user";
 @WebSocketGateway({cors: {origin: ['http://localhost:3000'],credentials: true}})
 export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
     constructor(@Inject(Services.GATEWAY_SESSION_STORE) private readonly sessions:ISessionStore,
                 @Inject(Services.CHAT) private readonly chatService:IChatsService,
-                @Inject(Services.GROUP) private readonly groupChatService:IGroupChatsService) {}
+                @Inject(Services.GROUP) private readonly groupChatService:IGroupChatsService,
+                @Inject(Services.USER) private readonly userService:IUserService) {}
                 
     
     @WebSocketServer() server: Server = new Server();
@@ -30,7 +32,8 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         if(client.user) {
             client.join(`private-chat-${client.user.id}`)
             console.log(client.rooms);
-            this.sessions.saveSession(client.user.id,client);
+            //this.sessions.saveSession(client.user.id,client);
+            await this.userService.updateUserPresence(client.user.id,"Online");
 
             /* this.server.on("connection", (client:AuthenticatedSocket) => {
                 client.broadcast.emit("userConnected", {
@@ -101,5 +104,10 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
         console.log("Disconnected")
         console.log(client.rooms);
     }
-    
+    @SubscribeMessage('onUserIdle')
+    async userIdleEvent(@ConnectedSocket() client:AuthenticatedSocket) {
+        if(!client.user) return;
+        console.log('User Idle event received');
+        await this.userService.updateUserPresence(client.user.id,"Away");
+    }
 }

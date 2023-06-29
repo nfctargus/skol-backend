@@ -37,4 +37,16 @@ export class UserService implements IUserService {
             .select(['user.id','user.firstName', 'user.lastName', 'user.email', 'user.username'])
             .getMany();
     }
+    getUserPresence(id:number) {
+        return this.userRepository.createQueryBuilder('user')
+        .where('user.id = :id', { id })
+        .select(['user.presence'])
+        .getOne()
+    }
+    async updateUserPresence(id:number,presence:string) {
+        const user = await this.findUser({id});
+        user.presence = presence;
+        await this.userRepository.save(user);
+        return this.getUserPresence(id);
+    }
 }

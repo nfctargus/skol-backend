@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Inject, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Query } from '@nestjs/common';
 import { Routes, Services } from 'utils/contants';
 import { IUserService } from './user';
 import { AuthUser } from 'utils/decorators';
@@ -13,5 +13,11 @@ export class UserController {
     searchUsers(@AuthUser() user:User,@Query('query') query: string) {
         if (!query) throw new HttpException('Invalid search terms', HttpStatus.BAD_REQUEST);
         return this.userService.searchUsers(user.id,query);
+    }
+    @Get('presence/:id')
+    async getUserPresence(@Param('id') id:number) {
+        const presence = await this.userService.getUserPresence(id);
+        console.log(presence)
+        return presence
     }
 }
