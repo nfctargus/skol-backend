@@ -14,10 +14,5 @@ export class UserController {
         if (!query) throw new HttpException('Invalid search terms', HttpStatus.BAD_REQUEST);
         return this.userService.searchUsers(user.id,query);
     }
-    @Get('presence/:id')
-    async getUserPresence(@Param('id') id:number) {
-        const presence = await this.userService.getUserPresence(id);
-        console.log(presence)
-        return presence
-    }
+    
 }

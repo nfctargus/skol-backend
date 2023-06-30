@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne, PrimaryGen
 import { PrivateMessage } from "./PrivateMessage";
 import { GroupChat } from "./GroupChat";
 import { UserProfile } from "./UserProfile";
+import { UserPresence } from "./UserPresence";
 
 @Entity({name: 'users'})
 export class User {
@@ -36,6 +37,6 @@ export class User {
     @JoinColumn()
     profile: UserProfile;
 
-    @Column({nullable: true,default:"Offline"})
-    presence:string;
+    @OneToOne(() => UserPresence, (presence) => presence.user)
+    presence:UserPresence;
 }

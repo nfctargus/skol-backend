@@ -6,14 +6,14 @@ import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
 import { Services } from "utils/contants";
 import { IChatsService } from "src/chats/chats";
 import { IGroupChatsService } from "src/group-chats/group-chats";
-import { IUserService } from "src/users/user";
+import { IUserPresenceService } from "src/users/presence/user-presence";
 @WebSocketGateway({cors: {origin: ['http://localhost:3000'],credentials: true}})
 export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
 
     constructor(@Inject(Services.GATEWAY_SESSION_STORE) private readonly sessions:ISessionStore,
                 @Inject(Services.CHAT) private readonly chatService:IChatsService,
                 @Inject(Services.GROUP) private readonly groupChatService:IGroupChatsService,
-                @Inject(Services.USER) private readonly userService:IUserService) {}
+                @Inject(Services.USER_PRESENCE) private readonly userPresenceService:IUserPresenceService) {}
                 
     
     @WebSocketServer() server: Server = new Server();
@@ -33,7 +33,7 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
             client.join(`private-chat-${client.user.id}`)
             console.log(client.rooms);
             //this.sessions.saveSession(client.user.id,client);
-            await this.userService.updateUserPresence(client.user.id,"Online");
+            await this.userPresenceService.setUserPresence(client.user.id,"Online");
 
             /* this.server.on("connection", (client:AuthenticatedSocket) => {
                 client.broadcast.emit("userConnected", {
@@ -91,7 +91,7 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
     async userIdleEvent(@ConnectedSocket() client:AuthenticatedSocket) {
         if(!client.user) return;
         console.log('User Idle event received');
-        await this.userService.updateUserPresence(client.user.id,"Away");
+        await this.userPresenceService.setUserPresence(client.user.id,"Away");
     }
     @SubscribeMessage('onGroupChatMemberAdd')
     async groupChatMemberAdd(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {groupId}:EditGroupChatMemberEventParams) {

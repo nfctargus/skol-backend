@@ -1,20 +1,25 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { IUserService } from './user';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'utils/typeorm';
+import { User, UserPresence } from 'utils/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserParams, FindUserParams } from 'utils/types';
 import { hashPassword } from 'utils/helpers';
+import { IUserPresenceService } from './presence/user-presence';
+import { Services } from 'utils/contants';
 
 @Injectable()
 export class UserService implements IUserService {
-    constructor(@InjectRepository(User) private readonly userRepository:Repository<User>) {}
+    constructor(@InjectRepository(User) private readonly userRepository:Repository<User>,
+                @Inject(Services.USER_PRESENCE) private readonly userPresenceService:IUserPresenceService) {}
+
     async createUser(userDetails:CreateUserParams) {
         const userExists = await this.findUser({email: userDetails.email})
         if(userExists) throw new HttpException("A user with this email address already exists.",HttpStatus.CONFLICT);
         const password = await hashPassword(userDetails.password);
         const newUser = this.userRepository.create({...userDetails,password});
-        return this.userRepository.save(newUser);
+        await this.userRepository.save(newUser);
+        return this.userPresenceService.createUserPresence(newUser);
     }
     async findUser({id,email,username}: FindUserParams): Promise<User> {
         return this.userRepository.findOne({
@@ -36,17 +41,5 @@ export class UserService implements IUserService {
             .limit(10)
             .select(['user.id','user.firstName', 'user.lastName', 'user.email', 'user.username'])
             .getMany();
-    }
-    getUserPresence(id:number) {
-        return this.userRepository.createQueryBuilder('user')
-        .where('user.id = :id', { id })
-        .select(['user.presence'])
-        .getOne()
-    }
-    async updateUserPresence(id:number,presence:string) {
-        const user = await this.findUser({id});
-        user.presence = presence;
-        await this.userRepository.save(user);
-        return this.getUserPresence(id);
     }
 }

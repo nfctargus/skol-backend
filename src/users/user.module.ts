@@ -3,12 +3,16 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { Services } from 'utils/contants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User, UserProfile } from 'utils/typeorm';
+import { Friend, User, UserPresence, UserProfile } from 'utils/typeorm';
 import { ProfileService } from './profiles/user-profile.service';
 import { ProfileController } from './profiles/user-profile.controller';
+import { UserPresenceController } from './presence/user-presence.controller';
+import { UserPresenceService } from './presence/user-presence.service';
 
 @Module({
-    imports:[TypeOrmModule.forFeature([User,UserProfile])],
+    imports:[
+        TypeOrmModule.forFeature([User,UserProfile,UserPresence,Friend]),
+    ],
     providers: [
         {
             provide:Services.USER,
@@ -18,9 +22,12 @@ import { ProfileController } from './profiles/user-profile.controller';
             provide:Services.USER_PROFILE,
             useClass:ProfileService
         },
-        
+        {
+            provide:Services.USER_PRESENCE,
+            useClass:UserPresenceService
+        },  
     ],
-    controllers: [UserController, ProfileController],
+    controllers: [UserController, ProfileController, UserPresenceController],
     exports:[
         {
             provide:Services.USER,
@@ -30,6 +37,10 @@ import { ProfileController } from './profiles/user-profile.controller';
             provide:Services.USER_PROFILE,
             useClass:ProfileService
         },
+        {
+            provide:Services.USER_PRESENCE,
+            useClass:UserPresenceService
+        },  
     ]
 })
 export class UserModule {}
