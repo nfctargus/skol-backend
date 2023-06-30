@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Friend, User } from 'utils/typeorm';
 import { Services } from 'utils/contants';
 import { IFriendsService } from 'src/friends/friends';
+import { SetUserPresenceParams } from 'utils/types';
 
 @Injectable()
 export class UserPresenceService implements IUserPresenceService {
@@ -29,9 +30,10 @@ export class UserPresenceService implements IUserPresenceService {
             where: { user: { id } }
         });
     };
-    async setUserPresence(id: number, presence: string): Promise<UserPresence> {
+    async setUserPresence({id,presence}:SetUserPresenceParams): Promise<UserPresence> {
         const user = await this.getUserPresence(id);
         user.userPresence = presence;
+        await this.userPresenceRepository.save(user);
         return this.userRepository.save(user);
     }
     async getFriendsPresence(user:User): Promise<User[]> {

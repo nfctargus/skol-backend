@@ -142,3 +142,7 @@ export type EditFriendsEventParams = {
     friendId:number;
     id?:number;
 }
+export type SetUserPresenceParams = {
+    id:number;
+    presence:string;
+}

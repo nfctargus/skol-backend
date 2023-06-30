@@ -33,7 +33,7 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
             client.join(`private-chat-${client.user.id}`)
             console.log(client.rooms);
             //this.sessions.saveSession(client.user.id,client);
-            await this.userPresenceService.setUserPresence(client.user.id,"Online");
+            await this.userPresenceService.setUserPresence({id:client.user.id,presence:"Online"});
 
             /* this.server.on("connection", (client:AuthenticatedSocket) => {
                 client.broadcast.emit("userConnected", {
@@ -91,7 +91,7 @@ export class EventsGateway implements OnGatewayConnection,OnGatewayDisconnect  {
     async userIdleEvent(@ConnectedSocket() client:AuthenticatedSocket) {
         if(!client.user) return;
         console.log('User Idle event received');
-        await this.userPresenceService.setUserPresence(client.user.id,"Away");
+        //await this.userPresenceService.setUserPresence({id:client.user.id,presence:"Offline"});
     }
     @SubscribeMessage('onGroupChatMemberAdd')
     async groupChatMemberAdd(@ConnectedSocket() client:AuthenticatedSocket,@MessageBody() {groupId}:EditGroupChatMemberEventParams) {
