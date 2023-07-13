@@ -22,52 +22,32 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Setting up the Backend
 
-## Installation
+1. Clone both this repository and the skol-frontend repository.
+2. Run `npm install` to install dependencies.
+3. Create an SQL database using a platform such as MySQL
+4. Create a `.env.development` file in the root directory and add the following variables:
 
-```bash
-$ npm install
-```
+   ```
+    PORT=
+    COOKIE_SECRET=
+    COOKIE_MAX_AGE=86400000
+    SESSION_NAME=chatapp_sessionID
+    MYSQL_DB_HOST=
+    MYSQL_DB_USERNAME=
+    MYSQL_DB_PASSWORD=
+    MYSQL_DB_PORT=
+    MYSQL_DB_NAME=
+   ```
 
-## Running the app
+   - **`PORT`** The port your NestJS server will run on
+   - **`MYSQL_DB_HOST`** The hostname for your SQL database (i.e. localhost)
+   - **`MYSQL_DB_USERNAME`** The username for your database platform account
+   - **`MYSQL_DB_PASSWORD`** The password for your database platform user account
+   - **`MYSQL_DB_PORT`** The port your SQL server is running on
+   - **`MYSQL_DB_NAME`** The name of your database
+   - **`COOKIE_SECRET`** Cookie secret 
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+5. Run `npm run start:dev` to start the project in development mode.
