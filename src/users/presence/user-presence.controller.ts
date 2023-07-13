@@ -20,4 +20,9 @@ export class UserPresenceController {
     async setUserPresence(@AuthUser() user:User,@Body() {presence}:EditUserPresenceDto) {
         return this.userPresenceService.setUserPresence({id:user.id,presence});
     }
+    @Post('/create')
+    async createUserPresence(@AuthUser() user:User) {
+        return this.userPresenceService.createUserPresence(user); 
+    }
+    
 }

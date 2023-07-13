@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { IUserPresenceService } from './user-presence';
 import { UserPresence } from 'utils/typeorm/entities/UserPresence';
 import { Repository } from 'typeorm';
@@ -32,6 +32,7 @@ export class UserPresenceService implements IUserPresenceService {
     };
     async setUserPresence({id,presence}:SetUserPresenceParams): Promise<UserPresence> {
         const user = await this.getUserPresence(id);
+        if(!user) throw new HttpException('Unable to update user presence, user presence null', HttpStatus.NOT_FOUND);
         user.userPresence = presence;
         await this.userPresenceRepository.save(user);
         return this.userRepository.save(user);
