@@ -15,7 +15,7 @@ export class FriendsService implements IFriendsService {
                 @Inject(Services.USER) private readonly userService:IUserService) {}
     async addFriend({user,email}:AddFriendParams): Promise<Friend> {
         const userTwo = await this.userService.findUser({email})
-        if(!userTwo) throw new HttpException("Invalid user",HttpStatus.BAD_REQUEST);
+        if(!userTwo) throw new HttpException("User does not exist",HttpStatus.NOT_FOUND);
         const friends = await this.isFriends(user.id,userTwo.id);
         if(friends) throw new HttpException("Already friends",HttpStatus.CONFLICT);
         const newFriend = await this.friendRepository.create({userOne:user,userTwo})

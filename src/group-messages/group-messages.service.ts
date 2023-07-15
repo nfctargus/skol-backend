@@ -25,14 +25,14 @@ export class GroupMessagesService implements IGroupMessagesService {
     }
     getGroupMessages(id: number): Promise<GroupMessage[]> {
         return this.groupMessageRepository.find({
-            relations: ['author','author.profile','groupChat'],
+            relations: ['author','groupChat'],
             where: { groupChat: { id } },
             order: { createdAt: 'DESC' },
         });
     }
     getGroupMessageById(id: number): Promise<GroupMessage> {
         return this.groupMessageRepository.findOne({
-            relations: ['author','author.profile','groupChat.creator','groupChat.lastMessageSent','groupChat.members','groupChat.members.profile'],
+            relations: ['author','groupChat.creator','groupChat.lastMessageSent','groupChat.members'],
             where: { id },
         });
     }
@@ -46,24 +46,31 @@ export class GroupMessagesService implements IGroupMessagesService {
         return {messageId:id,message:newGroupMessage,updatedChat};
     }
     async deleteGroupMessage({id,user}: DeleteGroupMessageParams) {
-        const groupMessage = await this.getGroupMessageById(id);
-        const {groupChat} = groupMessage;
-        if(!groupMessage) throw new HttpException('Group message not found',HttpStatus.BAD_REQUEST);
-        if(groupMessage.author.id !== user.id || groupChat.creator.id !== user.id) throw new HttpException('Only the group chat creator or message author can delete messages!',HttpStatus.BAD_REQUEST);
         
-        if(groupChat.lastMessageSent.id !== id) {
+        const groupMessage = await this.getGroupMessageById(id);  
+        const {groupChat} = groupMessage;
+        console.log(groupMessage.author.id !== user.id)
+        console.log(groupChat.creator)
+        if(!groupMessage) throw new HttpException('Group message not found',HttpStatus.BAD_REQUEST);
+        
+        if(groupChat.creator.id !== user.id) {
+            if(groupMessage.author.id !== user.id) throw new HttpException('Only the message author or group owner can delete messages!',HttpStatus.BAD_REQUEST);
+        }
+        
+        if(groupChat.lastMessageSent.id !== id) { 
             await this.groupMessageRepository.delete(id);
         } else {
             const group = await this.groupChatService.getGroupChatById(groupChat.id);
-            const LAST_MESSAGE_INDEX = group.messages.length -2;
             if(group.messages.length <= 1) {
-                console.log("length 1")
                 await this.groupChatService.update({id: groupChat.id,lastMessageSent: null});
                 return this.groupMessageRepository.delete({ id });
-            } else {
-                console.log("length >1")
-                console.log(LAST_MESSAGE_INDEX);
-                const newLastMessage = group.messages[LAST_MESSAGE_INDEX];
+            } else if (group.messages.length === 2) {
+                const newLastMessage = group.messages[0];
+                await this.groupChatService.update({id: groupChat.id,lastMessageSent: newLastMessage});
+                return this.groupMessageRepository.delete({ id });
+            }    
+            else {
+                const newLastMessage = group.messages[1];
                 await this.groupChatService.update({id: groupChat.id,lastMessageSent: newLastMessage});
                 return this.groupMessageRepository.delete({ id });
             }    

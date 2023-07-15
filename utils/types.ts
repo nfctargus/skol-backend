@@ -8,6 +8,11 @@ export type CreateUserParams = {
     username:string;
     password:string;
 }
+export type UpdateUserParams = {
+    user:User;
+    data:any;
+    avatar?:Express.Multer.File;
+}
 export type ValidateUserCredentials = {
     email:string;
     password:string;
@@ -88,10 +93,6 @@ export type CreateGroupChatParams = {
     creator:User;
     members:string[];
     message:string;
-}
-export type CreateUserProfileParams = {
-    user:User;
-    avatar?:Express.Multer.File;
 }
 export type AddAvatarGroupChatParams = {
     id:number;

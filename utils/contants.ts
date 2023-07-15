@@ -3,7 +3,6 @@ import { MulterField } from "@nestjs/platform-express/multer/interfaces/multer-o
 export enum Routes {
     AUTH = 'auth',
     USER = 'users',
-    USER_PROFILE = 'users/profiles',
     USER_PRESENCE = 'users/presence',
     FRIEND = 'friends',
     CHAT = 'chats',
@@ -14,7 +13,6 @@ export enum Routes {
 export enum Services {
     AUTH = 'AUTH_SERVICE',
     USER = 'USER_SERVICE',
-    USER_PROFILE = 'USER_PROFILE_SERVICE',
     USER_PRESENCE = 'USER_PRESENCE_SERVICE',
     FRIEND = 'FRIEND_SERVICE',
     CHAT = 'CHAT_SERVICE',

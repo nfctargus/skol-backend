@@ -7,10 +7,8 @@ import { PrivateMessage } from "./entities/PrivateMessage";
 import { Session } from "./entities/Session";
 import { User } from "./entities/User";
 import { UserPresence } from "./entities/UserPresence";
-import { UserProfile } from "./entities/UserProfile";
 
+const entities = [User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage,UserPresence];
 
-const entities = [User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage,UserProfile,UserPresence];
-
-export { User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage,UserProfile,UserPresence };
+export { User,Session,Friend,Chat,PrivateMessage,GroupChat,GroupMessage,UserPresence };
 export default entities;

@@ -3,7 +3,7 @@ import { IUserService } from './user';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserPresence } from 'utils/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserParams, FindUserParams } from 'utils/types';
+import { CreateUserParams, FindUserParams, UpdateUserParams } from 'utils/types';
 import { hashPassword } from 'utils/helpers';
 import { IUserPresenceService } from './presence/user-presence';
 import { Services } from 'utils/contants';
@@ -12,7 +12,16 @@ import { Services } from 'utils/contants';
 export class UserService implements IUserService {
     constructor(@InjectRepository(User) private readonly userRepository:Repository<User>,
                 @Inject(Services.USER_PRESENCE) private readonly userPresenceService:IUserPresenceService) {}
-
+    async updateUser({user,data,avatar}: UpdateUserParams): Promise<User> {
+        const userExists = await this.findUser({id: user.id});
+        if(!user) throw new HttpException('Unable to find user', HttpStatus.NOT_FOUND);
+        if(avatar && avatar.filename) userExists.avatar = avatar.filename;
+        if(data.firstName) userExists.firstName = data.firstName;
+        if(data.lastName) userExists.lastName = data.lastName;
+        if(data.avatar) userExists.avatar = data.avatar;
+        console.log(userExists)
+        return this.userRepository.save(userExists);
+    }
     async createUser(userDetails:CreateUserParams) {
         const userExists = await this.findUser({email: userDetails.email})
         if(userExists) throw new HttpException("A user with this email address already exists.",HttpStatus.CONFLICT);
@@ -28,7 +37,7 @@ export class UserService implements IUserService {
                 email:email,
                 username:username
             },
-            relations: { profile: true }
+            relations: { presence: true }
         });
     }
     searchUsers(userId:number,query: string) {
@@ -36,7 +45,6 @@ export class UserService implements IUserService {
         return this.userRepository
             .createQueryBuilder('user')
             .where(statement, { query: `%${query}%` })
-            .leftJoinAndSelect('user.profile','profile')
             .andWhere('id != :id', {id:userId})
             .limit(10)
             .select(['user.id','user.firstName', 'user.lastName', 'user.email', 'user.username'])
