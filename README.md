@@ -28,20 +28,8 @@
 1. Clone both this repository and the skol-frontend repository.
 2. Run `npm install` to install dependencies.
 3. Create an SQL database using a platform such as MySQL
-4. Create a `.env.development` file in the root directory and add the following variables:
-
-   ```
-    PORT=
-    COOKIE_SECRET=
-    COOKIE_MAX_AGE=86400000
-    SESSION_NAME=chatapp_sessionID
-    MYSQL_DB_HOST=
-    MYSQL_DB_USERNAME=
-    MYSQL_DB_PASSWORD=
-    MYSQL_DB_PORT=
-    MYSQL_DB_NAME=
-   ```
-
+4. Update the image output path for the Express Middlware in utils/helpers.ts - multerConfig to point to your public/images folder for the frontend
+5. Update the `.env.development` file in the root directory as follows:
    - **`PORT`** The port your NestJS server will run on
    - **`MYSQL_DB_HOST`** The hostname for your SQL database (i.e. localhost)
    - **`MYSQL_DB_USERNAME`** The username for your database platform account
@@ -50,4 +38,4 @@
    - **`MYSQL_DB_NAME`** The name of your database
    - **`COOKIE_SECRET`** Cookie secret 
 
-5. Run `npm run start:dev` to start the project in development mode.
+6. Run `npm run start:dev` to start the project in development mode.
