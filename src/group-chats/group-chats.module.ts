@@ -1,25 +1,25 @@
 import { Module } from '@nestjs/common';
 import { GroupChatsController } from './group-chats.controller';
 import { GroupChatsService } from './group-chats.service';
-import { Services } from 'utils/contants';
+import { Services } from '../../utils/contants';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GroupChat, GroupMessage } from 'utils/typeorm';
-import { UserModule } from 'src/users/user.module';
+import { GroupChat, GroupMessage } from '../../utils/typeorm';
+import { UserModule } from '../users/user.module';
 
 @Module({
-	imports:[TypeOrmModule.forFeature([GroupChat,GroupMessage]),UserModule],
+	imports: [TypeOrmModule.forFeature([GroupChat, GroupMessage]), UserModule],
 	controllers: [GroupChatsController],
 	providers: [
 		{
-			provide:Services.GROUP,
-			useClass:GroupChatsService
+			provide: Services.GROUP,
+			useClass: GroupChatsService
 		}
 	],
-	exports:[
+	exports: [
 		{
-			provide:Services.GROUP,
-			useClass:GroupChatsService
+			provide: Services.GROUP,
+			useClass: GroupChatsService
 		}
 	]
 })
-export class GroupChatsModule {}
+export class GroupChatsModule { }

@@ -1,25 +1,24 @@
 import { Injectable } from "@nestjs/common";
-import { AuthenticatedSocket, ISessionStore } from "utils/interfaces";
+import { AuthenticatedSocket, ISessionStore } from "../../utils/interfaces";
 import { Socket } from 'socket.io';
-import { User } from "utils/typeorm";
 
 @Injectable()
 export class SessionStore implements ISessionStore {
-    private readonly sessions:Map<number,AuthenticatedSocket> = new Map();
-    constructor() {}
+    private readonly sessions: Map<number, AuthenticatedSocket> = new Map();
+    constructor() { }
 
-    findSession(id:number):Socket {
+    findSession(id: number): Socket {
         return this.sessions.get(id);
     }
-    saveSession(id:number,socket:Socket) {
+    saveSession(id: number, socket: Socket) {
         this.sessions.set(id, socket);
-        
+
     }
-    findAllSessions():Socket[] {
+    findAllSessions(): Socket[] {
         return [...this.sessions.values()];
     }
-    deleteSession(id:number) {
+    deleteSession(id: number) {
         this.sessions.delete(id);
     }
-    
+
 }
